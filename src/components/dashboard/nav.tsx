@@ -51,8 +51,8 @@ export function DashboardNav({ user }: DashboardNavProps) {
       <div className="mx-auto max-w-full px-8">
         <div className="flex h-20 items-center justify-between">
           <div className="flex items-center flex-1 gap-12">
-            <Link href="/dashboard" className="text-2xl font-bold text-gray-900 whitespace-nowrap">
-              🍹 Pulpas
+            <Link href="/dashboard" className="text-3xl font-bold text-gray-900 whitespace-nowrap">
+              🍹 FrutyLab
             </Link>
             <div className="hidden md:flex md:flex-1 md:justify-center md:gap-6">
               {navItems.map((item) => (
