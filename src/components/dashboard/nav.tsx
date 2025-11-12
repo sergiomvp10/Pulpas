@@ -27,6 +27,7 @@ const navItems = [
   { href: '/dashboard/products', label: 'Productos' },
   { href: '/dashboard/inventory', label: 'Inventario' },
   { href: '/dashboard/sales', label: 'Ventas' },
+  { href: '/dashboard/customers', label: 'Clientes' },
   { href: '/dashboard/sellers', label: 'Vendedores' },
   { href: '/dashboard/billing', label: 'Facturación' },
   { href: '/dashboard/reports', label: 'Reportes' },
