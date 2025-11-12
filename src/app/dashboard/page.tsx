@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardStats } from '@/components/dashboard/stats';
-import { ExpiringLots } from '@/components/dashboard/expiring-lots';
+import { LowStock } from '@/components/dashboard/low-stock';
 import { RecentSales } from '@/components/dashboard/recent-sales';
 import { TopProducts } from '@/components/dashboard/top-products';
 
@@ -26,7 +26,7 @@ export default function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-2">
         <Suspense fallback={<Card><CardContent className="p-6">Cargando...</CardContent></Card>}>
-          <ExpiringLots />
+          <LowStock />
         </Suspense>
 
         <Suspense fallback={<Card><CardContent className="p-6">Cargando...</CardContent></Card>}>

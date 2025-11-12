@@ -8,7 +8,7 @@ const CRITICAL_STOCK_THRESHOLD = 5;
 export async function LowStock() {
   const lowStockVariants = await prisma.productVariant.findMany({
     where: {
-      isActive: true,
+      active: true,
     },
     include: {
       productBase: true,
@@ -23,7 +23,7 @@ export async function LowStock() {
 
   const variantsWithStock = lowStockVariants
     .map((variant) => {
-      const totalStock = variant.lots.reduce((sum, lot) => sum + lot.unitsOnHand, 0);
+      const totalStock = variant.lots.reduce((sum: number, lot) => sum + lot.unitsOnHand, 0);
       return {
         ...variant,
         totalStock,
