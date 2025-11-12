@@ -27,6 +27,8 @@ const navItems = [
   { href: '/dashboard/products', label: 'Productos' },
   { href: '/dashboard/inventory', label: 'Inventario' },
   { href: '/dashboard/sales', label: 'Ventas' },
+  { href: '/dashboard/sellers', label: 'Vendedores' },
+  { href: '/dashboard/billing', label: 'Facturación' },
   { href: '/dashboard/reports', label: 'Reportes' },
 ];
 
@@ -44,19 +46,19 @@ export function DashboardNav({ user }: DashboardNavProps) {
   };
 
   return (
-    <nav className="border-b bg-white">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="text-xl font-bold text-gray-900">
+    <nav className="border-b bg-white shadow-sm">
+      <div className="mx-auto max-w-full px-8">
+        <div className="flex h-20 items-center justify-between">
+          <div className="flex items-center flex-1 gap-12">
+            <Link href="/dashboard" className="text-2xl font-bold text-gray-900 whitespace-nowrap">
               🍹 Pulpas
             </Link>
-            <div className="hidden md:flex md:gap-4">
+            <div className="hidden md:flex md:flex-1 md:justify-center md:gap-6">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`rounded-lg px-5 py-3 text-base font-medium transition-colors whitespace-nowrap ${
                     pathname === item.href
                       ? 'bg-gray-100 text-gray-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
