@@ -66,6 +66,11 @@ export default function ProductsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Productos</h1>
           <p className="text-gray-500">Gestión de productos y presentaciones</p>
         </div>
+        <Link href="/dashboard/products/new">
+          <Button size="lg">
+            Añadir Producto
+          </Button>
+        </Link>
       </div>
 
       <Suspense fallback={<div>Cargando productos...</div>}>
