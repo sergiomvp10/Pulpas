@@ -10,6 +10,11 @@ export default async function NewProductPage() {
   const categories = await prisma.category.findMany({
     where: { active: true },
     orderBy: { name: 'asc' },
+    select: {
+      id: true,
+      name: true,
+      pricePerGram: true,
+    },
   });
 
   return (
