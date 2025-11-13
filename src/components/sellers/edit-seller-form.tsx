@@ -15,6 +15,7 @@ interface EditSellerFormProps {
     email: string | null;
     commissionRate: number;
     notes: string | null;
+    createdAt: Date;
   };
 }
 
@@ -60,6 +61,20 @@ export function EditSellerForm({ seller }: EditSellerFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
+        <Label>Fecha de Inscripción</Label>
+        <Input
+          type="text"
+          value={new Date(seller.createdAt).toLocaleDateString('es-CO', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+          disabled
+          className="bg-gray-50"
+        />
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="name">Nombre</Label>
         <Input
           id="name"
@@ -70,22 +85,24 @@ export function EditSellerForm({ seller }: EditSellerFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Teléfono (opcional)</Label>
+        <Label htmlFor="phone">Teléfono</Label>
         <Input
           id="phone"
           type="tel"
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email (opcional)</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
           id="email"
           type="email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
         />
       </div>
 

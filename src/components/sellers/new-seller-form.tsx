@@ -59,22 +59,24 @@ export function NewSellerForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Teléfono (opcional)</Label>
+        <Label htmlFor="phone">Teléfono</Label>
         <Input
           id="phone"
           type="tel"
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email (opcional)</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
           id="email"
           type="email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
         />
       </div>
 

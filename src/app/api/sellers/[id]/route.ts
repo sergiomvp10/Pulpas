@@ -5,8 +5,8 @@ import { z } from 'zod';
 
 const updateSellerSchema = z.object({
   name: z.string().min(1).optional(),
-  phone: z.string().optional(),
-  email: z.string().email().optional().or(z.literal('')),
+  phone: z.string().min(1).optional(),
+  email: z.string().email().min(1).optional(),
   commissionRate: z.number().min(0).max(1).optional(),
   notes: z.string().optional(),
 });
