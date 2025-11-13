@@ -17,6 +17,17 @@ export default async function NewLotPage() {
         { productBase: { name: 'asc' } },
         { gramWeightG: 'asc' },
       ],
+      select: {
+        id: true,
+        sku: true,
+        gramWeightG: true,
+        pricePerUnit: true,
+        productBase: {
+          select: {
+            name: true,
+          },
+        },
+      },
     }),
     prisma.inventoryLocation.findMany({
       where: { active: true },
