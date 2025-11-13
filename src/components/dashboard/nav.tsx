@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import {
@@ -51,8 +52,18 @@ export function DashboardNav({ user }: DashboardNavProps) {
       <div className="mx-auto max-w-full px-8">
         <div className="flex h-20 items-center justify-between">
           <div className="flex items-center flex-1 gap-12">
-            <Link href="/dashboard" className="text-3xl font-bold text-gray-900 whitespace-nowrap">
-              🍹 FrutyLab
+            <Link href="/dashboard" className="flex items-center gap-3 whitespace-nowrap">
+              <Image 
+                src="/frutylab-logo.png" 
+                alt="FrutyLab Logo" 
+                width={60} 
+                height={60}
+                className="object-contain"
+                priority
+              />
+              <span className="text-3xl font-bold bg-gradient-to-r from-green-600 to-orange-500 bg-clip-text text-transparent">
+                FrutyLab
+              </span>
             </Link>
             <div className="hidden md:flex md:flex-1 md:justify-center md:gap-6">
               {navItems.map((item) => (
