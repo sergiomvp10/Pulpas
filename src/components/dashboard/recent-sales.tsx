@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/pricing';
 import { formatDateTimeColombia } from '@/lib/date-utils';
+import { RecentSalesCollapsible } from './recent-sales-collapsible';
 
 export async function RecentSales() {
   const recentSales = await prisma.sale.findMany({
@@ -29,10 +30,10 @@ export async function RecentSales() {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="relative">
         <CardTitle className="text-xl">Ventas Recientes</CardTitle>
-      </CardHeader>
-      <CardContent>
+        <RecentSalesCollapsible>
+          <div className="mt-4">
         {recentSales.length === 0 ? (
           <p className="text-base text-gray-500 py-4">No hay ventas registradas</p>
         ) : (
@@ -64,7 +65,9 @@ export async function RecentSales() {
             ))}
           </div>
         )}
-      </CardContent>
+          </div>
+        </RecentSalesCollapsible>
+      </CardHeader>
     </Card>
   );
 }
