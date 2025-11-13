@@ -6,7 +6,8 @@ import { z } from 'zod';
 const updateCustomerSchema = z.object({
   name: z.string().min(1).optional(),
   phone: z.string().min(1).optional(),
-  email: z.string().email().optional().or(z.literal('')),
+  email: z.string().optional(),
+  city: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -29,6 +30,7 @@ export async function PATCH(
       data: {
         ...validatedData,
         email: validatedData.email || null,
+        city: validatedData.city || null,
       },
     });
 

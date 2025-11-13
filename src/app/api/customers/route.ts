@@ -6,7 +6,8 @@ import { z } from 'zod';
 const createCustomerSchema = z.object({
   name: z.string().min(1),
   phone: z.string().min(1),
-  email: z.string().email().optional().or(z.literal('')),
+  email: z.string().optional(),
+  city: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
       data: {
         ...validatedData,
         email: validatedData.email || null,
+        city: validatedData.city || null,
       },
     });
 
