@@ -45,7 +45,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -53,13 +53,14 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await context.params;
     const product = await prisma.productBase.update({
-      where: { id: params.id },
+      where: { id },
       data: { active: false },
     });
 
     await prisma.productVariant.updateMany({
-      where: { productBaseId: params.id },
+      where: { productBaseId: id },
       data: { active: false },
     });
 
