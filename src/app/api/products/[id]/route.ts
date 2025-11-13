@@ -12,7 +12,7 @@ const updateProductSchema = z.object({
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -20,11 +20,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await context.params;
     const body = await request.json();
     const validatedData = updateProductSchema.parse(body);
 
     const product = await prisma.productBase.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
       include: {
         category: true,
