@@ -10,17 +10,27 @@ export default async function NewSalePage() {
   const [productVariants, customers] = await Promise.all([
     prisma.productVariant.findMany({
       where: { active: true },
-      include: {
-        productBase: {
-          include: {
-            category: true,
-          },
-        },
-      },
       orderBy: [
         { productBase: { name: 'asc' } },
         { gramWeightG: 'asc' },
       ],
+      select: {
+        id: true,
+        sku: true,
+        gramWeightG: true,
+        pricePerUnit: true,
+        manualPriceCents: true,
+        productBase: {
+          select: {
+            name: true,
+            category: {
+              select: {
+                defaultMargin: true,
+              },
+            },
+          },
+        },
+      },
     }),
     prisma.customer.findMany({
       orderBy: { name: 'asc' },

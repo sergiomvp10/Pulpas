@@ -14,6 +14,7 @@ interface ProductVariant {
   id: string;
   sku: string;
   gramWeightG: number;
+  pricePerUnit: number;
   manualPriceCents: number | null;
   productBase: {
     name: string;
@@ -176,7 +177,14 @@ export function NewSaleForm({ productVariants, customers }: NewSaleFormProps) {
                 <Label>Producto</Label>
                 <Select
                   value={currentLine.productVariantId}
-                  onValueChange={(value) => setCurrentLine({ ...currentLine, productVariantId: value })}
+                  onValueChange={(value) => {
+                    const selectedVariant = productVariants.find(v => v.id === value);
+                    setCurrentLine({ 
+                      ...currentLine, 
+                      productVariantId: value,
+                      unitPrice: selectedVariant ? selectedVariant.pricePerUnit.toString() : '',
+                    });
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona producto" />
