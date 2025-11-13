@@ -14,6 +14,7 @@ export function NewCustomerForm() {
     name: '',
     phone: '',
     email: '',
+    city: '',
     notes: '',
   });
 
@@ -73,6 +74,17 @@ export function NewCustomerForm() {
           placeholder="Calle 123 #45-67"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="city">Ciudad</Label>
+        <Input
+          id="city"
+          type="text"
+          placeholder="Bogotá"
+          value={formData.city}
+          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
         />
       </div>
 

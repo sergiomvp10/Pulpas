@@ -13,6 +13,7 @@ interface EditCustomerFormProps {
     name: string;
     phone: string;
     email: string | null;
+    city: string | null;
     notes: string | null;
   };
 }
@@ -24,6 +25,7 @@ export function EditCustomerForm({ customer }: EditCustomerFormProps) {
     name: customer.name,
     phone: customer.phone,
     email: customer.email || '',
+    city: customer.city || '',
     notes: customer.notes || '',
   });
 
@@ -83,6 +85,17 @@ export function EditCustomerForm({ customer }: EditCustomerFormProps) {
           placeholder="Calle 123 #45-67"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="city">Ciudad</Label>
+        <Input
+          id="city"
+          type="text"
+          placeholder="Bogotá"
+          value={formData.city}
+          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
         />
       </div>
 
