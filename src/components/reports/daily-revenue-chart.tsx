@@ -23,14 +23,14 @@ export function DailyRevenueChart({ dailyData }: DailyRevenueChartProps) {
   const maxRevenue = Math.max(...dailyData.map(d => d.revenue), 1);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col">
       <h3 className="text-sm font-medium text-gray-700 mb-4">Ingresos Diarios del Mes</h3>
-      <div className="flex-1 flex items-end justify-between gap-1 pb-8 relative">
+      <div className="h-56 md:h-64 flex items-end justify-between gap-1 pb-8 relative">
         {dailyData.map((data) => {
           const heightPercent = (data.revenue / maxRevenue) * 100;
           
           return (
-            <div key={data.day} className="flex-1 flex flex-col items-center group relative">
+            <div key={data.day} className="flex-1 h-full flex flex-col items-center group relative">
               <div 
                 className="w-full bg-blue-500 hover:bg-blue-600 transition-colors rounded-t relative"
                 style={{ height: `${Math.max(heightPercent, 2)}%` }}
