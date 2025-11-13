@@ -23,23 +23,53 @@ async function ProductsList() {
     orderBy: { name: 'asc' },
   });
 
+  const tradicionales = products
+    .filter(p => p.category.name === 'Tradicional')
+    .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  
+  const exoticos = products
+    .filter(p => p.category.name === 'Exóticos')
+    .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {products.map((product) => (
-        <Card key={product.id}>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-lg">{product.name}</CardTitle>
-                <Badge variant="outline" className="mt-2">
-                  {product.category.name}
-                </Badge>
-              </div>
-              <ProductActions productId={product.id} productName={product.name} />
-            </div>
-          </CardHeader>
-        </Card>
-      ))}
+    <div className="space-y-8">
+      {/* Tradicional Section */}
+      {tradicionales.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold text-gray-900">TRADICIONAL</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {tradicionales.map((product) => (
+              <Card key={product.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-lg">{product.name}</CardTitle>
+                    <ProductActions productId={product.id} productName={product.name} />
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Exóticos Section */}
+      {exoticos.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold text-gray-900">EXÓTICOS</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {exoticos.map((product) => (
+              <Card key={product.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-lg">{product.name}</CardTitle>
+                    <ProductActions productId={product.id} productName={product.name} />
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
