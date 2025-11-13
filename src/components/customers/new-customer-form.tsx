@@ -66,10 +66,11 @@ export function NewCustomerForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email (opcional)</Label>
+        <Label htmlFor="email">Dirección</Label>
         <Input
           id="email"
-          type="email"
+          type="text"
+          placeholder="Calle 123 #45-67"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
