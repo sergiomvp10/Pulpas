@@ -37,7 +37,7 @@ export async function RecentSales() {
   return (
     <Card>
       <CardHeader className="relative">
-        <CardTitle className="text-xl">Ventas Recientes (últimas 36 horas)</CardTitle>
+        <CardTitle className="text-xl">Ventas Recientes</CardTitle>
         <RecentSalesCollapsible 
           mostRecentSale={mostRecentSale}
           allSales={recentSales}
