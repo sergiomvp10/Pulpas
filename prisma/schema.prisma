@@ -86,6 +86,7 @@ model Seller {
 model Category {
   id             String   @id @default(cuid())
   name           String   @unique
+  pricePerGram   Float    @default(10.0) @map("price_per_gram")
   defaultMargin  Float    @map("default_margin")
   description    String?
   active         Boolean  @default(true)
