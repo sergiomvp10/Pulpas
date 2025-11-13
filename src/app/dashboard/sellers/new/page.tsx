@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { NewSellerForm } from '@/components/sellers/new-seller-form';
 
 export const metadata = {
   title: 'Nuevo Vendedor | Sistema de Gestión de Pulpas',
@@ -17,12 +18,10 @@ export default function NewSellerPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Formulario de Vendedor</CardTitle>
+          <CardTitle>Información del Vendedor</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500">
-            Esta sección estará disponible próximamente para registrar nuevos vendedores con sus datos de contacto, zonas asignadas y comisiones.
-          </p>
+          <NewSellerForm />
         </CardContent>
       </Card>
     </div>

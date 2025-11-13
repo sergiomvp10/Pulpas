@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { NewCustomerForm } from '@/components/customers/new-customer-form';
 
 export const metadata = {
   title: 'Nuevo Cliente | Sistema de Gestión de Pulpas',
@@ -17,12 +18,10 @@ export default function NewCustomerPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Formulario de Cliente</CardTitle>
+          <CardTitle>Información del Cliente</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500">
-            Esta sección estará disponible próximamente para registrar nuevos clientes con sus datos de contacto e historial.
-          </p>
+          <NewCustomerForm />
         </CardContent>
       </Card>
     </div>

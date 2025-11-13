@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { ProductActions } from '@/components/products/product-actions';
 
 export const metadata = {
   title: 'Productos | Sistema de Gestión de Pulpas',
@@ -34,6 +35,7 @@ async function ProductsList() {
                   {product.category.name}
                 </Badge>
               </div>
+              <ProductActions productId={product.id} productName={product.name} />
             </div>
           </CardHeader>
           <CardContent>

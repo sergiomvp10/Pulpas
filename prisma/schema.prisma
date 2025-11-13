@@ -51,6 +51,7 @@ model Customer {
   phone     String
   email     String?
   notes     String?
+  active    Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -58,6 +59,24 @@ model Customer {
   sales Sale[]
 
   @@map("customers")
+}
+
+// ============================================
+// SELLERS
+// ============================================
+
+model Seller {
+  id             String   @id @default(cuid())
+  name           String
+  phone          String?
+  email          String?
+  commissionRate Float    @default(0.0) @map("commission_rate")
+  notes          String?
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("sellers")
 }
 
 // ============================================
