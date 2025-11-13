@@ -1,11 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { prisma } from '@/lib/db';
+import { NewProductForm } from '@/components/products/new-product-form';
 
 export const metadata = {
   title: 'Nuevo Producto | Sistema de Gestión de Pulpas',
   description: 'Crear nuevo producto',
 };
 
-export default function NewProductPage() {
+export default async function NewProductPage() {
+  const categories = await prisma.category.findMany({
+    where: { active: true },
+    orderBy: { name: 'asc' },
+  });
+
   return (
     <div className="space-y-6">
       <div>
@@ -15,16 +21,7 @@ export default function NewProductPage() {
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Formulario de Producto</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500">
-            Esta sección estará disponible próximamente para crear nuevos productos, definir categorías, márgenes y presentaciones.
-          </p>
-        </CardContent>
-      </Card>
+      <NewProductForm categories={categories} />
     </div>
   );
 }

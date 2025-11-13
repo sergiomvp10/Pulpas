@@ -123,6 +123,7 @@ model ProductVariant {
   sku               String   @unique
   barcode           String?
   photoUrl          String?  @map("photo_url")
+  pricePerUnit      Float    @default(0) @map("price_per_unit")
   marginOverride    Float?   @map("margin_override")
   manualPriceCents  Int?     @map("manual_price_cents")
   active            Boolean  @default(true)
