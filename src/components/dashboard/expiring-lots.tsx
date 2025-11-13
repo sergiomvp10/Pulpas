@@ -1,11 +1,11 @@
 import { prisma } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { format, differenceInDays } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { differenceInDays } from 'date-fns';
+import { formatDateShortColombia, nowColombia } from '@/lib/date-utils';
 
 export async function ExpiringLots() {
-  const now = new Date();
+  const now = nowColombia();
   const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
   const expiringLots = await prisma.lot.findMany({
@@ -41,7 +41,7 @@ export async function ExpiringLots() {
         ) : (
           <div className="space-y-4">
             {expiringLots.map((lot) => {
-              const daysUntilExpiry = differenceInDays(lot.expiryDate, new Date());
+              const daysUntilExpiry = differenceInDays(lot.expiryDate, nowColombia());
               const isUrgent = daysUntilExpiry <= 7;
 
               return (
@@ -59,7 +59,7 @@ export async function ExpiringLots() {
                       {daysUntilExpiry} días
                     </Badge>
                     <p className="mt-1 text-xs text-gray-500">
-                      {format(lot.expiryDate, 'dd MMM yyyy', { locale: es })}
+                      {formatDateShortColombia(lot.expiryDate)}
                     </p>
                   </div>
                 </div>

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { formatDateLongColombia } from '@/lib/date-utils';
 
 interface EditSellerFormProps {
   seller: {
@@ -64,11 +65,7 @@ export function EditSellerForm({ seller }: EditSellerFormProps) {
         <Label>Fecha de Inscripción</Label>
         <Input
           type="text"
-          value={new Date(seller.createdAt).toLocaleDateString('es-CO', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}
+          value={formatDateLongColombia(seller.createdAt)}
           disabled
           className="bg-gray-50"
         />

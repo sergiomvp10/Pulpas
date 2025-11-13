@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { format, differenceInDays } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { differenceInDays } from 'date-fns';
 import { formatCurrency } from '@/lib/pricing';
+import { formatDateShortColombia, nowColombia } from '@/lib/date-utils';
 
 export const metadata = {
   title: 'Inventario | Sistema de Gestión de Pulpas',
@@ -41,7 +41,7 @@ async function InventoryList() {
         </Card>
       ) : (
         lots.map((lot) => {
-          const daysUntilExpiry = differenceInDays(lot.expiryDate, new Date());
+          const daysUntilExpiry = differenceInDays(lot.expiryDate, nowColombia());
           const isExpiringSoon = daysUntilExpiry <= 30;
           const isExpired = daysUntilExpiry < 0;
 
@@ -72,11 +72,11 @@ async function InventoryList() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Fecha de Producción</p>
-                    <p className="text-sm">{format(lot.productionDate, 'dd MMM yyyy', { locale: es })}</p>
+                    <p className="text-sm">{formatDateShortColombia(lot.productionDate)}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Fecha de Vencimiento</p>
-                    <p className="text-sm">{format(lot.expiryDate, 'dd MMM yyyy', { locale: es })}</p>
+                    <p className="text-sm">{formatDateShortColombia(lot.expiryDate)}</p>
                   </div>
                 </div>
                 {lot.location && (

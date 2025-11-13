@@ -1,0 +1,59 @@
+import { format, toZonedTime } from 'date-fns-tz';
+import { es } from 'date-fns/locale';
+
+const COLOMBIA_TZ = 'America/Bogota';
+
+/**
+ * Format a date to Colombia timezone
+ * @param date - Date to format
+ * @param formatStr - Format string (default: "dd MMM yyyy 'a las' HH:mm")
+ * @returns Formatted date string in Colombia timezone
+ */
+export function formatDateColombia(date: Date | string, formatStr: string = "dd MMM yyyy 'a las' HH:mm"): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const zonedDate = toZonedTime(dateObj, COLOMBIA_TZ);
+  return format(zonedDate, formatStr, { locale: es, timeZone: COLOMBIA_TZ });
+}
+
+/**
+ * Format a date to Colombia timezone - short format (dd/MM/yyyy)
+ */
+export function formatDateShortColombia(date: Date | string): string {
+  return formatDateColombia(date, 'dd/MM/yyyy');
+}
+
+/**
+ * Format a date to Colombia timezone - long format with day name
+ */
+export function formatDateLongColombia(date: Date | string): string {
+  return formatDateColombia(date, "EEEE, dd 'de' MMMM 'de' yyyy");
+}
+
+/**
+ * Format a date to Colombia timezone - date and time
+ */
+export function formatDateTimeColombia(date: Date | string): string {
+  return formatDateColombia(date, "dd MMM yyyy 'a las' HH:mm");
+}
+
+/**
+ * Format a date to Colombia timezone - only time
+ */
+export function formatTimeColombia(date: Date | string): string {
+  return formatDateColombia(date, 'HH:mm');
+}
+
+/**
+ * Get current date/time in Colombia timezone
+ */
+export function nowColombia(): Date {
+  return toZonedTime(new Date(), COLOMBIA_TZ);
+}
+
+/**
+ * Convert a date to Colombia timezone
+ */
+export function toColombiaTime(date: Date | string): Date {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return toZonedTime(dateObj, COLOMBIA_TZ);
+}

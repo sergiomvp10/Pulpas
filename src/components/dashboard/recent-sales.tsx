@@ -2,8 +2,7 @@ import { prisma } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/pricing';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { formatDateTimeColombia } from '@/lib/date-utils';
 
 export async function RecentSales() {
   const recentSales = await prisma.sale.findMany({
@@ -50,7 +49,7 @@ export async function RecentSales() {
                     ).join(', ')}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {format(sale.occurredAt, "dd MMM yyyy 'a las' HH:mm", { locale: es })}
+                    {formatDateTimeColombia(sale.occurredAt)}
                   </p>
                 </div>
                 <div className="text-right">
