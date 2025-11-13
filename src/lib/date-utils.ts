@@ -57,3 +57,23 @@ export function toColombiaTime(date: Date | string): Date {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   return toZonedTime(dateObj, COLOMBIA_TZ);
 }
+
+/**
+ * Convert a Colombia local date/time to UTC
+ * Takes a date that represents a local Colombia time and returns the equivalent UTC date
+ */
+export function colombiaTimeToUtc(localDate: Date): Date {
+  const year = localDate.getFullYear();
+  const month = localDate.getMonth();
+  const day = localDate.getDate();
+  const hours = localDate.getHours();
+  const minutes = localDate.getMinutes();
+  const seconds = localDate.getSeconds();
+  const ms = localDate.getMilliseconds();
+  
+  const isoString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
+  
+  const utcDate = new Date(isoString + '-05:00');
+  
+  return utcDate;
+}

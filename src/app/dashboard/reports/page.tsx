@@ -2,9 +2,10 @@ import { Suspense } from 'react';
 import { prisma } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/pricing';
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, format, eachDayOfInterval, startOfDay } from 'date-fns';
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, format, eachDayOfInterval, startOfDay, endOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { DailyRevenueChart } from '@/components/reports/daily-revenue-chart';
+import { nowColombia, toColombiaTime, colombiaTimeToUtc } from '@/lib/date-utils';
 
 export const metadata = {
   title: 'Reportes | Sistema de Gestión de Pulpas',
@@ -80,12 +81,16 @@ async function SalesReport() {
 }
 
 async function ProfitReport() {
-  const monthStart = startOfMonth(new Date());
-  const monthEnd = endOfMonth(new Date());
+  const nowCol = nowColombia();
+  const monthStartCol = startOfMonth(nowCol);
+  const monthEndCol = endOfMonth(nowCol);
+  
+  const monthStartUtc = colombiaTimeToUtc(monthStartCol);
+  const monthEndUtc = colombiaTimeToUtc(endOfDay(monthEndCol));
 
   const sales = await prisma.sale.findMany({
     where: {
-      occurredAt: { gte: monthStart, lte: monthEnd },
+      occurredAt: { gte: monthStartUtc, lte: monthEndUtc },
       status: 'COMPLETED',
     },
     include: {
@@ -102,7 +107,7 @@ async function ProfitReport() {
 
   const dailyRevenueMap = new Map<number, number>();
   
-  const allDaysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const allDaysInMonth = eachDayOfInterval({ start: monthStartCol, end: monthEndCol });
   allDaysInMonth.forEach(day => {
     dailyRevenueMap.set(day.getDate(), 0);
   });
@@ -110,7 +115,8 @@ async function ProfitReport() {
   for (const sale of sales) {
     totalRevenue += sale.totalAmountCents;
     
-    const saleDay = new Date(sale.occurredAt).getDate();
+    const saleCol = toColombiaTime(sale.occurredAt);
+    const saleDay = saleCol.getDate();
     dailyRevenueMap.set(saleDay, (dailyRevenueMap.get(saleDay) || 0) + sale.totalAmountCents);
     
     for (const line of sale.saleLines) {
