@@ -38,22 +38,6 @@ async function ProductsList() {
               <ProductActions productId={product.id} productName={product.name} />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">
-                Margen: {(product.category.defaultMargin * 100).toFixed(0)}%
-              </p>
-              <div className="space-y-1">
-                <p className="text-xs font-medium text-gray-500">Presentaciones:</p>
-                {product.variants.map((variant) => (
-                  <div key={variant.id} className="flex items-center justify-between text-sm">
-                    <span>{variant.gramWeightG}g</span>
-                    <span className="text-xs text-gray-500">{variant.sku}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
         </Card>
       ))}
     </div>
