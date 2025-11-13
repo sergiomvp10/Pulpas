@@ -7,9 +7,10 @@ export const metadata = {
   title: 'Editar Cliente | Sistema de Gestión de Pulpas',
 };
 
-export default async function EditCustomerPage({ params }: { params: { id: string } }) {
+export default async function EditCustomerPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const customer = await prisma.customer.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!customer) {

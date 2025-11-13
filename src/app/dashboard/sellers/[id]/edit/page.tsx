@@ -7,9 +7,10 @@ export const metadata = {
   title: 'Editar Vendedor | Sistema de Gestión de Pulpas',
 };
 
-export default async function EditSellerPage({ params }: { params: { id: string } }) {
+export default async function EditSellerPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const seller = await prisma.seller.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!seller) {
