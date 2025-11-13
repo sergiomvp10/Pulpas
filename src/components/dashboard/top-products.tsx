@@ -42,33 +42,33 @@ export async function TopProducts() {
   );
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
-        <CardTitle>Productos Más Vendidos</CardTitle>
+        <CardTitle className="text-xl">Productos Más Vendidos</CardTitle>
       </CardHeader>
       <CardContent>
         {productsWithDetails.length === 0 ? (
-          <p className="text-sm text-gray-500">No hay datos de ventas</p>
+          <p className="text-base text-gray-500 py-4">No hay datos de ventas</p>
         ) : (
           <div className="space-y-4">
             {productsWithDetails.map((item, index) => (
-              <div key={item.productVariantId} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-sm font-bold">
+              <div key={item.productVariantId} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg font-bold">
                     {index + 1}
                   </div>
                   <div>
-                    <p className="text-sm font-medium">
+                    <p className="text-base font-semibold">
                       {item.variant?.productBase.name} {item.variant?.gramWeightG}g
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm text-gray-500">
                       SKU: {item.variant?.sku}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold">{item._sum.quantityUnits} unidades</p>
-                  <p className="text-xs text-gray-500">Últimos 30 días</p>
+                  <p className="text-base font-bold">{item._sum.quantityUnits} unidades</p>
+                  <p className="text-sm text-gray-500">Últimos 30 días</p>
                 </div>
               </div>
             ))}

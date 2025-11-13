@@ -34,13 +34,13 @@ export async function LowStock() {
     .slice(0, 5);
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
-        <CardTitle>Productos con Poco Inventario</CardTitle>
+        <CardTitle className="text-xl">Productos con Poco Inventario</CardTitle>
       </CardHeader>
       <CardContent>
         {variantsWithStock.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-base text-gray-500 py-4">
             Todos los productos tienen inventario suficiente
           </p>
         ) : (
@@ -49,20 +49,20 @@ export async function LowStock() {
               const isCritical = variant.totalStock <= CRITICAL_STOCK_THRESHOLD;
 
               return (
-                <div key={variant.id} className="flex items-center justify-between">
+                <div key={variant.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium">
+                    <p className="text-base font-semibold">
                       {variant.productBase.name} {variant.gramWeightG}g
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm text-gray-500">
                       SKU: {variant.sku}
                     </p>
                   </div>
                   <div className="text-right">
-                    <Badge variant={isCritical ? 'destructive' : 'secondary'}>
+                    <Badge variant={isCritical ? 'destructive' : 'secondary'} className="text-sm">
                       {variant.totalStock} {variant.totalStock === 1 ? 'unidad' : 'unidades'}
                     </Badge>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500">
                       {isCritical ? '¡Stock crítico!' : 'Stock bajo'}
                     </p>
                   </div>
