@@ -13,7 +13,7 @@ export async function DashboardStats() {
     lotsExpiringSoon,
     todaySales,
   ] = await Promise.all([
-    prisma.productVariant.count({ where: { active: true } }),
+    prisma.productBase.count({ where: { active: true } }),
     prisma.lot.count({ where: { status: 'APPROVED', unitsOnHand: { gt: 0 } } }),
     prisma.lot.count({
       where: {
@@ -42,7 +42,7 @@ export async function DashboardStats() {
     {
       title: 'Productos Activos',
       value: totalProducts.toString(),
-      description: 'Variantes de productos disponibles',
+      description: 'Productos únicos disponibles',
     },
     {
       title: 'Lotes en Stock',
