@@ -33,6 +33,7 @@ export default async function NewSalePage() {
       },
     }),
     prisma.customer.findMany({
+      where: { active: true },
       orderBy: { name: 'asc' },
     }),
   ]);
