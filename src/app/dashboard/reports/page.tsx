@@ -2,8 +2,9 @@ import { Suspense } from 'react';
 import { prisma } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/pricing';
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, format } from 'date-fns';
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, format, eachDayOfInterval, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { DailyRevenueChart } from '@/components/reports/daily-revenue-chart';
 
 export const metadata = {
   title: 'Reportes | Sistema de Gestión de Pulpas',
@@ -99,8 +100,18 @@ async function ProfitReport() {
   let totalRevenue = 0;
   let totalCost = 0;
 
+  const dailyRevenueMap = new Map<number, number>();
+  
+  const allDaysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  allDaysInMonth.forEach(day => {
+    dailyRevenueMap.set(day.getDate(), 0);
+  });
+
   for (const sale of sales) {
     totalRevenue += sale.totalAmountCents;
+    
+    const saleDay = new Date(sale.occurredAt).getDate();
+    dailyRevenueMap.set(saleDay, (dailyRevenueMap.get(saleDay) || 0) + sale.totalAmountCents);
     
     for (const line of sale.saleLines) {
       for (const lot of line.saleLineLots) {
@@ -112,25 +123,34 @@ async function ProfitReport() {
   const profit = totalRevenue - totalCost;
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
 
+  const dailyData = Array.from(dailyRevenueMap.entries())
+    .map(([day, revenue]) => ({ day, revenue }))
+    .sort((a, b) => a.day - b.day);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Rentabilidad del Mes</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div>
-            <p className="text-sm text-gray-500">Ingresos</p>
-            <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-gray-500">Ingresos</p>
+              <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Costos</p>
+              <p className="text-2xl font-bold">{formatCurrency(totalCost)}</p>
+            </div>
+            <div className="border-t pt-4">
+              <p className="text-sm text-gray-500">Ganancia</p>
+              <p className="text-3xl font-bold text-green-600">{formatCurrency(profit)}</p>
+              <p className="text-sm text-gray-500">Margen: {margin.toFixed(1)}%</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Costos</p>
-            <p className="text-2xl font-bold">{formatCurrency(totalCost)}</p>
-          </div>
-          <div className="border-t pt-4">
-            <p className="text-sm text-gray-500">Ganancia</p>
-            <p className="text-3xl font-bold text-green-600">{formatCurrency(profit)}</p>
-            <p className="text-sm text-gray-500">Margen: {margin.toFixed(1)}%</p>
+          <div className="border-l pl-6">
+            <DailyRevenueChart dailyData={dailyData} />
           </div>
         </div>
       </CardContent>
