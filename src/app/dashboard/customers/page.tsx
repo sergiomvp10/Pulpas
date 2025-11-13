@@ -47,7 +47,12 @@ async function CustomersList() {
               </p>
               {customer.email && (
                 <p className="text-sm text-gray-600">
-                  <span className="font-medium">Email:</span> {customer.email}
+                  <span className="font-medium">Dirección:</span> {customer.email}
+                </p>
+              )}
+              {customer.city && (
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Ciudad:</span> {customer.city}
                 </p>
               )}
               {customer.notes && (
