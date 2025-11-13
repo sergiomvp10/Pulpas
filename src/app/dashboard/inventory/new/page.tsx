@@ -10,9 +10,6 @@ export default async function NewLotPage() {
   const [productVariants, locations] = await Promise.all([
     prisma.productVariant.findMany({
       where: { active: true },
-      include: {
-        productBase: true,
-      },
       orderBy: [
         { productBase: { name: 'asc' } },
         { gramWeightG: 'asc' },
