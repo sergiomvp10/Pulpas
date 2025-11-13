@@ -13,6 +13,10 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     where: { id },
     include: {
       category: true,
+      variants: {
+        where: { active: true },
+        orderBy: { gramWeightG: 'asc' },
+      },
     },
   });
 
