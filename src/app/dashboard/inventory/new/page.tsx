@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from 'next/cache';
 import { prisma } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NewLotForm } from '@/components/inventory/new-lot-form';
@@ -7,6 +8,7 @@ export const metadata = {
 };
 
 export default async function NewLotPage() {
+  noStore();
   const [productVariants, locations] = await Promise.all([
     prisma.productVariant.findMany({
       where: { active: true },
