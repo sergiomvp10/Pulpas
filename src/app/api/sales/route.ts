@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       unitPriceCents: number;
     }
 
-    const sale = await prisma.$transaction(async (tx) => {
+    const sale = await prisma.$transaction(async (tx: any) => {
       const saleCount = await tx.sale.count();
       const saleNumber = `V-${String(saleCount + 1).padStart(6, '0')}`;
 
