@@ -6,10 +6,19 @@ export const metadata = {
   title: 'Nueva Venta | Sistema de Gestión de Pulpas',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function NewSalePage() {
   const [productVariants, customers] = await Promise.all([
     prisma.productVariant.findMany({
-      where: { active: true },
+      where: { 
+        active: true,
+        productBase: {
+          is: {
+            active: true,
+          },
+        },
+      },
       orderBy: [
         { productBase: { name: 'asc' } },
         { gramWeightG: 'asc' },
