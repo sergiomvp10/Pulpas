@@ -30,6 +30,7 @@ const allNavItems = [
   { href: '/dashboard/sales', label: 'Ventas', roles: ['ADMIN', 'SELLER'] },
   { href: '/dashboard/customers', label: 'Clientes', roles: ['ADMIN', 'SELLER'] },
   { href: '/dashboard/sellers', label: 'Vendedores', roles: ['ADMIN'] },
+  { href: '/dashboard/expenses', label: 'Gastos', roles: ['ADMIN'] },
   { href: '/dashboard/billing', label: 'Facturación', roles: ['ADMIN'] },
   { href: '/dashboard/reports', label: 'Reportes', roles: ['ADMIN'] },
 ];

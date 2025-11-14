@@ -31,6 +31,7 @@ model User {
   inventoryMovements InventoryMovement[] @relation("MovementCreatedBy")
   qcChecks           QCCheck[]           @relation("QCCheckedBy")
   salesCreated       Sale[]              @relation("SaleCreatedBy")
+  expensesCreated    Expense[]           @relation("ExpenseCreatedBy")
 
   @@map("users")
 }
@@ -386,6 +387,40 @@ enum NotificationStatus {
   QUEUED
   SENT
   FAILED
+}
+
+// ============================================
+// EXPENSES
+// ============================================
+
+model Expense {
+  id            String          @id @default(cuid())
+  expenseNumber String          @unique @map("expense_number")
+  description   String
+  category      ExpenseCategory
+  amountCents   Int             @map("amount_cents")
+  paymentMethod PaymentMethod   @map("payment_method")
+  expenseDate   DateTime        @map("expense_date")
+  notes         String?
+  receiptUrl    String?         @map("receipt_url")
+  createdById   String          @map("created_by_id")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  createdBy User @relation("ExpenseCreatedBy", fields: [createdById], references: [id])
+
+  @@index([expenseDate])
+  @@index([category])
+  @@map("expenses")
+}
+
+enum ExpenseCategory {
+  INSUMOS
+  RENTA
+  SERVICIOS
+  EMPLEADOS
+  OTROS
 }
 
 // ============================================
