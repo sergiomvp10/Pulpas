@@ -37,8 +37,12 @@ const allNavItems = [
 export function DashboardNav({ user }: DashboardNavProps) {
   const pathname = usePathname();
   
+  if (!user.role) {
+    return null;
+  }
+  
   const navItems = allNavItems.filter(item => 
-    item.roles.includes(user.role || 'ADMIN')
+    item.roles.includes(user.role)
   );
 
   const getInitials = (name?: string | null) => {
