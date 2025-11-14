@@ -3,7 +3,20 @@ import { LoginForm } from '@/components/auth/login-form';
 
 export const metadata: Metadata = {
   title: 'Iniciar Sesión | FrutyLab',
-  description: 'Inicia sesión en FrutyLab',
+  description: 'Sistema de Gestión FrutyLab',
+  openGraph: {
+    title: 'Sistema de Gestión FrutyLab',
+    description: 'Sistema de Gestión FrutyLab',
+    url: 'https://frutylab.vercel.app',
+    siteName: 'FrutyLab',
+    locale: 'es_CO',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Sistema de Gestión FrutyLab',
+    description: 'Sistema de Gestión FrutyLab',
+  },
 };
 
 export default function LoginPage() {
