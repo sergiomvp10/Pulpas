@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import { LoginForm } from '@/components/auth/login-form';
 
 export const metadata: Metadata = {
@@ -32,10 +33,15 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            FrutyLab
-          </h1>
+        <div className="flex justify-center">
+          <Image
+            src="/frutylab-full-logo.jpg"
+            alt="FrutyLab - fresh fruit"
+            width={300}
+            height={300}
+            priority
+            className="w-64 h-auto"
+          />
         </div>
         <LoginForm />
       </div>
