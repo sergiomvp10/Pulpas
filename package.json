@@ -2,9 +2,6 @@
   "name": "pulpas",
   "version": "0.1.0",
   "private": true,
-  "imports": {
-    "auth": "./src/auth.ts"
-  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
