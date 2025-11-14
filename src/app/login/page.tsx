@@ -35,7 +35,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex justify-center">
           <Image
-            src="/frutylab-full-logo.jpg"
+            src="/frutylab-full-logo.png"
             alt="FrutyLab - fresh fruit"
             width={300}
             height={300}
