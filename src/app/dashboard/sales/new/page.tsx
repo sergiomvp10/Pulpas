@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NewSaleForm } from '@/components/sales/new-sale-form';
+import { auth } from 'auth';
 
 export const metadata = {
   title: 'Nueva Venta | Sistema de Gestión de Pulpas',
@@ -9,7 +10,10 @@ export const metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function NewSalePage() {
-  const [productVariants, customers] = await Promise.all([
+  const session = await auth();
+  const userRole = session?.user?.role || 'ADMIN';
+
+  const [productVariants, customers, sellers] = await Promise.all([
     prisma.productVariant.findMany({
       where: { 
         active: true,
@@ -46,6 +50,16 @@ export default async function NewSalePage() {
       where: { active: true },
       orderBy: { name: 'asc' },
     }),
+    userRole === 'ADMIN' 
+      ? prisma.seller.findMany({
+          where: { active: true },
+          orderBy: { name: 'asc' },
+          select: {
+            id: true,
+            name: true,
+          },
+        })
+      : Promise.resolve([]),
   ]);
 
   return (
@@ -60,7 +74,12 @@ export default async function NewSalePage() {
           <CardTitle>Datos de la Venta</CardTitle>
         </CardHeader>
         <CardContent>
-          <NewSaleForm productVariants={productVariants} customers={customers} />
+          <NewSaleForm 
+            productVariants={productVariants} 
+            customers={customers} 
+            sellers={sellers}
+            userRole={userRole}
+          />
         </CardContent>
       </Card>
     </div>

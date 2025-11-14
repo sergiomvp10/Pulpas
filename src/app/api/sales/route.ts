@@ -40,6 +40,13 @@ export async function POST(request: NextRequest) {
         if (seller) {
           sellerId = seller.id;
         }
+      } else if (session.user.role === 'ADMIN' && body.sellerId) {
+        const seller = await tx.seller.findUnique({
+          where: { id: body.sellerId, active: true },
+        });
+        if (seller) {
+          sellerId = seller.id;
+        }
       }
 
       const newSale = await tx.sale.create({
