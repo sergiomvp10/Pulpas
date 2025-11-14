@@ -70,7 +70,7 @@ export function NewProductForm({ categories }: NewProductFormProps) {
   const pricePerGram = selectedCategory?.pricePerGram || 0;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} autoComplete="off" className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Información del Producto</CardTitle>

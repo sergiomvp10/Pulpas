@@ -55,7 +55,7 @@ export function EditCustomerForm({ customer }: EditCustomerFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="name">Nombre</Label>
         <Input

@@ -60,7 +60,7 @@ export function EditSellerForm({ seller }: EditSellerFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
       <div className="space-y-2">
         <Label>Fecha de Inscripción</Label>
         <Input
