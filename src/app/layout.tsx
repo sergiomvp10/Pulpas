@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "FrutyLab",
   description: "Sistema de Gestión FrutyLab",
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
   openGraph: {
     title: "Sistema de Gestión FrutyLab",
     description: "Sistema de Gestión FrutyLab",
@@ -22,11 +26,20 @@ export const metadata: Metadata = {
     siteName: "FrutyLab",
     locale: "es_CO",
     type: "website",
+    images: [
+      {
+        url: '/frutylab-og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'FrutyLab Logo',
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Sistema de Gestión FrutyLab",
     description: "Sistema de Gestión FrutyLab",
+    images: ['/frutylab-og-image.png'],
   },
 };
 
