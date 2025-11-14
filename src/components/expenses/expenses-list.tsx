@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/pricing';
 import { formatDateTimeColombia } from '@/lib/date-utils';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, Calendar } from 'lucide-react';
 
 interface Expense {
   id: string;
@@ -42,16 +44,25 @@ export function ExpensesList() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [showDateFilter, setShowDateFilter] = useState(false);
 
   useEffect(() => {
     fetchExpenses();
-  }, [categoryFilter]);
+  }, [categoryFilter, startDate, endDate]);
 
   const fetchExpenses = async () => {
     try {
       const params = new URLSearchParams();
       if (categoryFilter !== 'ALL') {
         params.append('category', categoryFilter);
+      }
+      if (startDate) {
+        params.append('startDate', startDate);
+      }
+      if (endDate) {
+        params.append('endDate', endDate);
       }
 
       const response = await fetch(`/api/expenses?${params.toString()}`);
@@ -64,6 +75,12 @@ export function ExpensesList() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const clearDateFilter = () => {
+    setStartDate('');
+    setEndDate('');
+    setShowDateFilter(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -110,14 +127,65 @@ export function ExpensesList() {
                   <SelectItem value="OTROS">Otros</SelectItem>
                 </SelectContent>
               </Select>
+              <Button
+                variant={showDateFilter ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowDateFilter(!showDateFilter)}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Filtrar por Fecha
+              </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent>
+          {showDateFilter && (
+            <div className="mb-6 p-4 border rounded-lg bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="startDate">Fecha Inicio</Label>
+                  <Input
+                    id="startDate"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endDate">Fecha Fin</Label>
+                  <Input
+                    id="endDate"
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    variant="outline"
+                    onClick={clearDateFilter}
+                    className="w-full"
+                  >
+                    Limpiar Filtro
+                  </Button>
+                </div>
+              </div>
+              {startDate && endDate && (
+                <p className="text-sm text-gray-600 mt-2">
+                  Mostrando gastos desde {new Date(startDate).toLocaleDateString('es-CO')} hasta {new Date(endDate).toLocaleDateString('es-CO')}
+                </p>
+              )}
+            </div>
+          )}
           <div className="text-center py-4">
             <p className="text-sm text-gray-500">Total de Gastos</p>
             <p className="text-3xl font-bold">{formatCurrency(totalExpenses)}</p>
             <p className="text-sm text-gray-500 mt-1">{expenses.length} gasto(s) registrado(s)</p>
+            {startDate && endDate && (
+              <p className="text-xs text-blue-600 mt-2">
+                Período: {new Date(startDate).toLocaleDateString('es-CO')} - {new Date(endDate).toLocaleDateString('es-CO')}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
