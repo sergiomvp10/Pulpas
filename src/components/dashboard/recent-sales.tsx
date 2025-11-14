@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db';
-import { auth } from 'auth';
+import { auth } from '@/auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/pricing';

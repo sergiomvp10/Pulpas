@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import QRCode from 'qrcode';
-import { auth } from 'auth';
+import { auth } from '@/auth';
 
 export async function POST(request: NextRequest) {
   try {

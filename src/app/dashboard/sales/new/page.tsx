@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NewSaleForm } from '@/components/sales/new-sale-form';
-import { auth } from 'auth';
+import { auth } from '@/auth';
 
 export const metadata = {
   title: 'Nueva Venta | Sistema de Gestión de Pulpas',

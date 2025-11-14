@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { auth } from 'auth';
+import { auth } from '@/auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardStats } from '@/components/dashboard/stats';
 import { LowStock } from '@/components/dashboard/low-stock';
