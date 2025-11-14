@@ -36,9 +36,6 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             FrutyLab
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Inicia sesión para acceder al sistema
-          </p>
         </div>
         <LoginForm />
       </div>
