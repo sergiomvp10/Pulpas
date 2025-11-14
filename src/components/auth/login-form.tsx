@@ -86,11 +86,6 @@ export function LoginForm() {
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </Button>
-
-          <div className="mt-4 text-center text-sm text-gray-600">
-            <p>Usuario de prueba:</p>
-            <p className="font-mono text-xs">admin@frutylab.com / admin123</p>
-          </div>
         </form>
       </CardContent>
     </Card>
