@@ -30,7 +30,7 @@ async function SellersList() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {sellers.map((seller) => (
+      {sellers.map((seller: any) => (
         <Card key={seller.id}>
           <CardHeader>
             <div className="flex items-start justify-between">

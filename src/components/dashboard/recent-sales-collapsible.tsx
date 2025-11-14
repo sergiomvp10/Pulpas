@@ -105,7 +105,7 @@ export function RecentSalesCollapsible({ mostRecentSale, allSales }: RecentSales
           )
         ) : (
           <div className="space-y-5">
-            {allSales.map((sale) => renderSale(sale))}
+            {allSales.map((sale: any) => renderSale(sale))}
           </div>
         )}
       </div>

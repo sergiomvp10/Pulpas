@@ -152,7 +152,7 @@ export function NewSaleForm({ productVariants, customers, sellers, userRole }: N
               <SelectValue placeholder="Selecciona un cliente" />
             </SelectTrigger>
             <SelectContent>
-              {customers.map((customer) => (
+              {customers.map((customer: any) => (
                 <SelectItem key={customer.id} value={customer.id}>
                   {customer.name}
                 </SelectItem>
@@ -169,7 +169,7 @@ export function NewSaleForm({ productVariants, customers, sellers, userRole }: N
                 <SelectValue placeholder="Selecciona un vendedor" />
               </SelectTrigger>
               <SelectContent>
-                {sellers.map((seller) => (
+                {sellers.map((seller: any) => (
                   <SelectItem key={seller.id} value={seller.id}>
                     {seller.name}
                   </SelectItem>

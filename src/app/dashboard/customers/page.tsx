@@ -30,7 +30,7 @@ async function CustomersList() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {customers.map((customer) => (
+      {customers.map((customer: any) => (
         <Card key={customer.id}>
           <CardHeader>
             <div className="flex items-start justify-between">

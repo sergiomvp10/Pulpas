@@ -38,7 +38,7 @@ async function ProductsList() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-gray-900">TRADICIONAL</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {tradicionales.map((product) => (
+            {tradicionales.map((product: any) => (
               <Card key={product.id}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -57,7 +57,7 @@ async function ProductsList() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-gray-900">EXÓTICOS</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {exoticos.map((product) => (
+            {exoticos.map((product: any) => (
               <Card key={product.id}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
