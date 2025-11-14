@@ -23,19 +23,23 @@ interface DashboardNavProps {
   };
 }
 
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/dashboard/products', label: 'Productos' },
-  { href: '/dashboard/inventory', label: 'Inventario' },
-  { href: '/dashboard/sales', label: 'Ventas' },
-  { href: '/dashboard/customers', label: 'Clientes' },
-  { href: '/dashboard/sellers', label: 'Vendedores' },
-  { href: '/dashboard/billing', label: 'Facturación' },
-  { href: '/dashboard/reports', label: 'Reportes' },
+const allNavItems = [
+  { href: '/dashboard', label: 'Dashboard', roles: ['ADMIN', 'SELLER'] },
+  { href: '/dashboard/products', label: 'Productos', roles: ['ADMIN'] },
+  { href: '/dashboard/inventory', label: 'Inventario', roles: ['ADMIN'] },
+  { href: '/dashboard/sales', label: 'Ventas', roles: ['ADMIN', 'SELLER'] },
+  { href: '/dashboard/customers', label: 'Clientes', roles: ['ADMIN', 'SELLER'] },
+  { href: '/dashboard/sellers', label: 'Vendedores', roles: ['ADMIN'] },
+  { href: '/dashboard/billing', label: 'Facturación', roles: ['ADMIN'] },
+  { href: '/dashboard/reports', label: 'Reportes', roles: ['ADMIN'] },
 ];
 
 export function DashboardNav({ user }: DashboardNavProps) {
   const pathname = usePathname();
+  
+  const navItems = allNavItems.filter(item => 
+    item.roles.includes(user.role || 'ADMIN')
+  );
 
   const getInitials = (name?: string | null) => {
     if (!name) return 'U';
@@ -101,10 +105,14 @@ export function DashboardNav({ user }: DashboardNavProps) {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings">Configuración</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              {user.role === 'ADMIN' && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings">Configuración</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem
                 className="cursor-pointer text-red-600"
                 onClick={() => signOut({ callbackUrl: '/login' })}

@@ -27,11 +27,7 @@ export async function PATCH(
 
     const seller = await prisma.seller.update({
       where: { id },
-      data: {
-        ...validatedData,
-        email: validatedData.email || null,
-        phone: validatedData.phone || null,
-      },
+      data: validatedData,
     });
 
     return NextResponse.json(seller);

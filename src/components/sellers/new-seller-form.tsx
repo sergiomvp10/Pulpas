@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function NewSellerForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [credentials, setCredentials] = useState<{ email: string; password: string } | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -33,18 +35,48 @@ export function NewSellerForm() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create seller');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create seller');
       }
 
-      router.push('/dashboard/sellers');
-      router.refresh();
+      const data = await response.json();
+      
+      setCredentials(data.credentials);
     } catch (error) {
       console.error('Error creating seller:', error);
-      alert('Error al crear el vendedor');
+      alert(error instanceof Error ? error.message : 'Error al crear el vendedor');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleClose = () => {
+    router.push('/dashboard/sellers');
+    router.refresh();
+  };
+
+  if (credentials) {
+    return (
+      <div className="space-y-4">
+        <Alert>
+          <AlertTitle>¡Vendedor creado exitosamente!</AlertTitle>
+          <AlertDescription className="space-y-2 mt-2">
+            <p className="font-semibold">Credenciales de acceso:</p>
+            <div className="bg-gray-100 p-3 rounded space-y-1">
+              <p><strong>Usuario:</strong> {credentials.email}</p>
+              <p><strong>Contraseña:</strong> {credentials.password}</p>
+            </div>
+            <p className="text-sm text-red-600 mt-2">
+              ⚠️ Guarda estas credenciales. No se mostrarán de nuevo.
+            </p>
+          </AlertDescription>
+        </Alert>
+        <Button onClick={handleClose}>
+          Volver a Vendedores
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

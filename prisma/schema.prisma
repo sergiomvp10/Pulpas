@@ -15,27 +15,29 @@ datasource db {
 // ============================================
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  phone         String?
-  role          UserRole  @default(ADMIN)
-  passwordHash  String    @map("password_hash")
-  isActive      Boolean   @default(true) @map("is_active")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  role         UserRole @default(ADMIN)
+  passwordHash String   @map("password_hash")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   // Relations
-  lotsCreated         Lot[]               @relation("LotCreatedBy")
-  inventoryMovements  InventoryMovement[] @relation("MovementCreatedBy")
-  qcChecks            QCCheck[]           @relation("QCCheckedBy")
-  salesCreated        Sale[]              @relation("SaleCreatedBy")
+  seller             Seller?             @relation("SellerUser")
+  lotsCreated        Lot[]               @relation("LotCreatedBy")
+  inventoryMovements InventoryMovement[] @relation("MovementCreatedBy")
+  qcChecks           QCCheck[]           @relation("QCCheckedBy")
+  salesCreated       Sale[]              @relation("SaleCreatedBy")
 
   @@map("users")
 }
 
 enum UserRole {
   ADMIN
+  SELLER
   ALMACEN
   CALIDAD
   VENTAS
@@ -69,13 +71,18 @@ model Customer {
 model Seller {
   id             String   @id @default(cuid())
   name           String
-  phone          String?
-  email          String?
+  phone          String
+  email          String
+  userId         String?  @unique @map("user_id")
   commissionRate Float    @default(0.0) @map("commission_rate")
   notes          String?
   active         Boolean  @default(true)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user  User?  @relation("SellerUser", fields: [userId], references: [id])
+  sales Sale[] @relation("SellerSales")
 
   @@map("sellers")
 }
@@ -85,14 +92,14 @@ model Seller {
 // ============================================
 
 model Category {
-  id             String   @id @default(cuid())
-  name           String   @unique
-  pricePerGram   Float    @default(10.0) @map("price_per_gram")
-  defaultMargin  Float    @map("default_margin")
-  description    String?
-  active         Boolean  @default(true)
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id            String   @id @default(cuid())
+  name          String   @unique
+  pricePerGram  Float    @default(10.0) @map("price_per_gram")
+  defaultMargin Float    @map("default_margin")
+  description   String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   // Relations
   productBases ProductBase[]
@@ -112,25 +119,25 @@ model ProductBase {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  category Category          @relation(fields: [categoryId], references: [id])
+  category Category         @relation(fields: [categoryId], references: [id])
   variants ProductVariant[]
 
   @@map("product_bases")
 }
 
 model ProductVariant {
-  id                String   @id @default(cuid())
-  productBaseId     String   @map("product_base_id")
-  gramWeightG       Int      @map("gram_weight_g")
-  sku               String   @unique
-  barcode           String?
-  photoUrl          String?  @map("photo_url")
-  pricePerUnit      Float    @default(0) @map("price_per_unit")
-  marginOverride    Float?   @map("margin_override")
-  manualPriceCents  Int?     @map("manual_price_cents")
-  active            Boolean  @default(true)
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  id               String   @id @default(cuid())
+  productBaseId    String   @map("product_base_id")
+  gramWeightG      Int      @map("gram_weight_g")
+  sku              String   @unique
+  barcode          String?
+  photoUrl         String?  @map("photo_url")
+  pricePerUnit     Float    @default(0) @map("price_per_unit")
+  marginOverride   Float?   @map("margin_override")
+  manualPriceCents Int?     @map("manual_price_cents")
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   // Relations
   productBase ProductBase @relation(fields: [productBaseId], references: [id])
@@ -161,20 +168,20 @@ model InventoryLocation {
 }
 
 model Lot {
-  id                 String    @id @default(cuid())
-  code               String    @unique
-  productVariantId   String    @map("product_variant_id")
-  productionDate     DateTime  @map("production_date")
-  expiryDate         DateTime  @map("expiry_date")
-  unitsInitial       Int       @map("units_initial")
-  unitsOnHand        Int       @map("units_on_hand")
-  costPerUnitCents   Int       @map("cost_per_unit_cents")
-  status             LotStatus @default(APPROVED)
-  locationId         String?   @map("location_id")
-  notes              String?
-  createdById        String    @map("created_by_id")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
+  id               String    @id @default(cuid())
+  code             String    @unique
+  productVariantId String    @map("product_variant_id")
+  productionDate   DateTime  @map("production_date")
+  expiryDate       DateTime  @map("expiry_date")
+  unitsInitial     Int       @map("units_initial")
+  unitsOnHand      Int       @map("units_on_hand")
+  costPerUnitCents Int       @map("cost_per_unit_cents")
+  status           LotStatus @default(APPROVED)
+  locationId       String?   @map("location_id")
+  notes            String?
+  createdById      String    @map("created_by_id")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
   // Relations
   productVariant     ProductVariant      @relation(fields: [productVariantId], references: [id])
@@ -197,15 +204,15 @@ enum LotStatus {
 }
 
 model InventoryMovement {
-  id            String               @id @default(cuid())
-  lotId         String               @map("lot_id")
+  id            String                @id @default(cuid())
+  lotId         String                @map("lot_id")
   type          InventoryMovementType
-  quantityUnits Int                  @map("quantity_units")
-  referenceType ReferenceType?       @map("reference_type")
-  referenceId   String?              @map("reference_id")
+  quantityUnits Int                   @map("quantity_units")
+  referenceType ReferenceType?        @map("reference_type")
+  referenceId   String?               @map("reference_id")
   notes         String?
-  createdById   String               @map("created_by_id")
-  createdAt     DateTime             @default(now()) @map("created_at")
+  createdById   String                @map("created_by_id")
+  createdAt     DateTime              @default(now()) @map("created_at")
 
   // Relations
   lot       Lot  @relation(fields: [lotId], references: [id])
@@ -236,15 +243,15 @@ enum ReferenceType {
 // ============================================
 
 model QCCheck {
-  id          String    @id @default(cuid())
-  lotId       String    @map("lot_id")
+  id          String   @id @default(cuid())
+  lotId       String   @map("lot_id")
   brix        Float?
   ph          Float?
   temperature Float?
   status      QCStatus
   notes       String?
-  checkedById String    @map("checked_by_id")
-  checkedAt   DateTime  @default(now()) @map("checked_at")
+  checkedById String   @map("checked_by_id")
+  checkedAt   DateTime @default(now()) @map("checked_at")
 
   // Relations
   lot       Lot  @relation(fields: [lotId], references: [id])
@@ -264,28 +271,31 @@ enum QCStatus {
 // ============================================
 
 model Sale {
-  id              String        @id @default(cuid())
-  saleNumber      String        @unique @map("sale_number")
-  occurredAt      DateTime      @default(now()) @map("occurred_at")
-  customerId      String?       @map("customer_id")
-  channel         SaleChannel   @default(MANUAL)
-  paymentMethod   PaymentMethod @map("payment_method")
-  status          SaleStatus    @default(COMPLETED)
-  totalAmountCents Int          @map("total_amount_cents")
-  currency        String        @default("COP")
-  dueDate         DateTime?     @map("due_date")
-  paidAt          DateTime?     @map("paid_at")
-  notes           String?
-  createdById     String        @map("created_by_id")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
+  id               String        @id @default(cuid())
+  saleNumber       String        @unique @map("sale_number")
+  occurredAt       DateTime      @default(now()) @map("occurred_at")
+  customerId       String?       @map("customer_id")
+  sellerId         String?       @map("seller_id")
+  channel          SaleChannel   @default(MANUAL)
+  paymentMethod    PaymentMethod @map("payment_method")
+  status           SaleStatus    @default(COMPLETED)
+  totalAmountCents Int           @map("total_amount_cents")
+  currency         String        @default("COP")
+  dueDate          DateTime?     @map("due_date")
+  paidAt           DateTime?     @map("paid_at")
+  notes            String?
+  createdById      String        @map("created_by_id")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
 
   // Relations
   customer  Customer?  @relation(fields: [customerId], references: [id])
+  seller    Seller?    @relation("SellerSales", fields: [sellerId], references: [id])
   createdBy User       @relation("SaleCreatedBy", fields: [createdById], references: [id])
   saleLines SaleLine[]
 
   @@index([occurredAt])
+  @@index([sellerId])
   @@map("sales")
 }
 
@@ -307,28 +317,28 @@ enum SaleStatus {
 }
 
 model SaleLine {
-  id               String   @id @default(cuid())
-  saleId           String   @map("sale_id")
-  productVariantId String   @map("product_variant_id")
-  quantityUnits    Int      @map("quantity_units")
-  unitPriceCents   Int      @map("unit_price_cents")
-  discountCents    Int      @default(0) @map("discount_cents")
-  subtotalCents    Int      @map("subtotal_cents")
+  id               String @id @default(cuid())
+  saleId           String @map("sale_id")
+  productVariantId String @map("product_variant_id")
+  quantityUnits    Int    @map("quantity_units")
+  unitPriceCents   Int    @map("unit_price_cents")
+  discountCents    Int    @default(0) @map("discount_cents")
+  subtotalCents    Int    @map("subtotal_cents")
 
   // Relations
-  sale           Sale            @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  productVariant ProductVariant  @relation(fields: [productVariantId], references: [id])
+  sale           Sale           @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productVariant ProductVariant @relation(fields: [productVariantId], references: [id])
   saleLineLots   SaleLineLot[]
 
   @@map("sale_lines")
 }
 
 model SaleLineLot {
-  id                    String @id @default(cuid())
-  saleLineId            String @map("sale_line_id")
-  lotId                 String @map("lot_id")
-  quantityUnits         Int    @map("quantity_units")
-  costUnitCentsAtSale   Int    @map("cost_unit_cents_at_sale")
+  id                  String @id @default(cuid())
+  saleLineId          String @map("sale_line_id")
+  lotId               String @map("lot_id")
+  quantityUnits       Int    @map("quantity_units")
+  costUnitCentsAtSale Int    @map("cost_unit_cents_at_sale")
 
   // Relations
   saleLine SaleLine @relation(fields: [saleLineId], references: [id], onDelete: Cascade)
@@ -342,16 +352,16 @@ model SaleLineLot {
 // ============================================
 
 model NotificationLog {
-  id           String             @id @default(cuid())
+  id           String              @id @default(cuid())
   type         NotificationType
-  lotId        String?            @map("lot_id")
-  scheduledFor DateTime           @map("scheduled_for")
-  sentAt       DateTime?          @map("sent_at")
+  lotId        String?             @map("lot_id")
+  scheduledFor DateTime            @map("scheduled_for")
+  sentAt       DateTime?           @map("sent_at")
   recipient    String
   channel      NotificationChannel
-  status       NotificationStatus @default(QUEUED)
+  status       NotificationStatus  @default(QUEUED)
   error        String?
-  createdAt    DateTime           @default(now()) @map("created_at")
+  createdAt    DateTime            @default(now()) @map("created_at")
 
   // Relations
   lot Lot? @relation(fields: [lotId], references: [id])

@@ -32,10 +32,21 @@ export async function POST(request: NextRequest) {
         0
       );
 
+      let sellerId = null;
+      if (session.user.role === 'SELLER') {
+        const seller = await tx.seller.findUnique({
+          where: { userId: session.user.id },
+        });
+        if (seller) {
+          sellerId = seller.id;
+        }
+      }
+
       const newSale = await tx.sale.create({
         data: {
           saleNumber,
           customerId: customerId || null,
+          sellerId,
           paymentMethod,
           totalAmountCents,
           status: 'COMPLETED',

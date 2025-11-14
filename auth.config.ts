@@ -9,10 +9,30 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
       const isOnLogin = nextUrl.pathname.startsWith('/login');
+      const userRole = auth?.user?.role;
 
       if (isOnDashboard) {
-        if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
+        if (!isLoggedIn) return false;
+
+        if (userRole === 'SELLER') {
+          const allowedPaths = [
+            '/dashboard',
+            '/dashboard/sales',
+            '/dashboard/sales/new',
+            '/dashboard/customers',
+            '/dashboard/customers/new',
+          ];
+          
+          const isAllowed = allowedPaths.some(path => 
+            nextUrl.pathname === path || nextUrl.pathname.startsWith(path + '/')
+          );
+          
+          if (!isAllowed) {
+            return Response.redirect(new URL('/dashboard', nextUrl));
+          }
+        }
+        
+        return true;
       } else if (isLoggedIn && isOnLogin) {
         return Response.redirect(new URL('/dashboard', nextUrl));
       }
