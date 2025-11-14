@@ -26,6 +26,7 @@ export default async function NewSalePage() {
             category: {
               select: {
                 defaultMargin: true,
+                pricePerGram: true,
               },
             },
           },

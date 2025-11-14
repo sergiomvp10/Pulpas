@@ -20,6 +20,7 @@ interface ProductVariant {
     name: string;
     category: {
       defaultMargin: number;
+      pricePerGram: number;
     };
   };
 }
@@ -179,11 +180,33 @@ export function NewSaleForm({ productVariants, customers }: NewSaleFormProps) {
                   value={currentLine.productVariantId}
                   onValueChange={(value) => {
                     const selectedVariant = productVariants.find(v => v.id === value);
-                    setCurrentLine({ 
-                      ...currentLine, 
-                      productVariantId: value,
-                      unitPrice: selectedVariant ? selectedVariant.pricePerUnit.toString() : '',
-                    });
+                    if (selectedVariant) {
+                      let price = 0;
+                      
+                      if (selectedVariant.manualPriceCents && selectedVariant.manualPriceCents > 0) {
+                        price = selectedVariant.manualPriceCents / 100;
+                      }
+                      else if (Number(selectedVariant.pricePerUnit) > 0) {
+                        price = Number(selectedVariant.pricePerUnit);
+                      }
+                      else {
+                        const pricePerGram = selectedVariant.productBase.category.pricePerGram;
+                        const gramWeight = selectedVariant.gramWeightG;
+                        price = gramWeight * pricePerGram;
+                      }
+                      
+                      setCurrentLine({ 
+                        ...currentLine, 
+                        productVariantId: value,
+                        unitPrice: price.toString(),
+                      });
+                    } else {
+                      setCurrentLine({ 
+                        ...currentLine, 
+                        productVariantId: value,
+                        unitPrice: '',
+                      });
+                    }
                   }}
                 >
                   <SelectTrigger>
