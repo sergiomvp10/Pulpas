@@ -28,7 +28,7 @@ async function fixCategoryPrices() {
     });
 
     console.log('\nCurrent category prices:');
-    categories.forEach(c => {
+    categories.forEach((c: any) => {
       console.log(`  ${c.name}: ${c.pricePerGram} pesos/gramo`);
     });
 
