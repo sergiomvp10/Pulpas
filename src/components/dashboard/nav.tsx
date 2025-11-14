@@ -152,7 +152,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
+          className="fixed inset-0 z-40 bg-black bg-opacity-30 md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
