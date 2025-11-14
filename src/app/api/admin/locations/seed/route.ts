@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     const { secret } = await request.json();
@@ -10,30 +12,36 @@ export async function POST(request: NextRequest) {
     }
     
     const locationsToCreate = [
-      { name: 'Bodega Principal', description: 'Bodega principal de almacenamiento' },
-      { name: 'Almacén', description: 'Almacén general' },
-      { name: 'Refrigerador 1', description: 'Refrigerador número 1' },
-      { name: 'Refrigerador 2', description: 'Refrigerador número 2' },
+      { name: 'Bodega Principal', code: 'BODEGA-PRINCIPAL', description: 'Bodega principal de almacenamiento' },
+      { name: 'Almacén', code: 'ALMACEN', description: 'Almacén general' },
+      { name: 'Refrigerador 1', code: 'REFRIGERADOR-1', description: 'Refrigerador número 1' },
+      { name: 'Refrigerador 2', code: 'REFRIGERADOR-2', description: 'Refrigerador número 2' },
     ];
     
     const results = [];
     
     for (const location of locationsToCreate) {
       const existing = await prisma.inventoryLocation.findFirst({
-        where: { name: location.name }
+        where: { 
+          OR: [
+            { name: location.name },
+            { code: location.code }
+          ]
+        }
       });
       
       if (existing) {
-        results.push({ name: location.name, status: 'already_exists' });
+        results.push({ name: location.name, code: location.code, status: 'already_exists' });
       } else {
         const created = await prisma.inventoryLocation.create({
           data: {
             name: location.name,
+            code: location.code,
             description: location.description,
             active: true,
           }
         });
-        results.push({ name: created.name, status: 'created' });
+        results.push({ name: created.name, code: created.code, status: 'created' });
       }
     }
     
@@ -44,6 +52,11 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error seeding locations:', error);
-    return NextResponse.json({ error: 'Failed to seed locations' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to seed locations',
+      message: error instanceof Error ? error.message : String(error),
+      code: (error as any)?.code,
+      meta: (error as any)?.meta,
+    }, { status: 500 });
   }
 }
