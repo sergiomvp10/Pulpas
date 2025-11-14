@@ -15,6 +15,15 @@ interface Sale {
   customer: {
     name: string;
   } | null;
+  seller: {
+    id: string;
+    name: string;
+  } | null;
+  createdBy: {
+    id: string;
+    name: string;
+    role: string;
+  } | null;
   saleLines: Array<{
     quantityUnits: number;
     productVariant: {
@@ -48,6 +57,15 @@ export function RecentSalesCollapsible({ mostRecentSale, allSales }: RecentSales
         <p className="text-sm text-gray-500">
           {formatDateTimeColombia(sale.occurredAt)}
         </p>
+        {sale.seller ? (
+          <p className="text-xs text-blue-600 font-medium mt-1">
+            Vendedor: {sale.seller.name}
+          </p>
+        ) : sale.createdBy ? (
+          <p className="text-xs text-gray-500 mt-1">
+            {sale.createdBy.role === 'ADMIN' ? 'Registrada por Admin' : `Registrada por ${sale.createdBy.name}`}
+          </p>
+        ) : null}
       </div>
       <div className="text-right">
         <p className="text-xl font-bold">

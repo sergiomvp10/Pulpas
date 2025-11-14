@@ -34,6 +34,19 @@ export async function RecentSales() {
     where: whereClause,
     include: {
       customer: true,
+      seller: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      createdBy: {
+        select: {
+          id: true,
+          name: true,
+          role: true,
+        },
+      },
       saleLines: {
         include: {
           productVariant: {

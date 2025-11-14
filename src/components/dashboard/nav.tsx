@@ -42,7 +42,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
   }
   
   const navItems = allNavItems.filter(item => 
-    item.roles.includes(user.role)
+    item.roles.includes(user.role as string)
   );
 
   const getInitials = (name?: string | null) => {
