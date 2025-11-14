@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EditCustomerForm } from '@/components/customers/edit-customer-form';
 
 export const metadata = {
-  title: 'Editar Cliente | Sistema de Gestión de Pulpas',
+  title: 'Editar Cliente | FrutyLab',
 };
 
 export default async function EditCustomerPage({ params }: { params: Promise<{ id: string }> }) {

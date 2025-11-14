@@ -4,7 +4,7 @@ import { NewSaleForm } from '@/components/sales/new-sale-form';
 import { auth } from '@/auth';
 
 export const metadata = {
-  title: 'Nueva Venta | Sistema de Gestión de Pulpas',
+  title: 'Nueva Venta | FrutyLab',
 };
 
 export const dynamic = 'force-dynamic';

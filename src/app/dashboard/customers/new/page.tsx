@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NewCustomerForm } from '@/components/customers/new-customer-form';
 
 export const metadata = {
-  title: 'Nuevo Cliente | Sistema de Gestión de Pulpas',
+  title: 'Nuevo Cliente | FrutyLab',
   description: 'Crear nuevo cliente',
 };
 

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EditProductForm } from '@/components/products/edit-product-form';
 
 export const metadata = {
-  title: 'Editar Producto | Sistema de Gestión de Pulpas',
+  title: 'Editar Producto | FrutyLab',
 };
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {

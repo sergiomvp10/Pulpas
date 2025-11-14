@@ -3,7 +3,7 @@ import { SettingsForm } from '@/components/settings/settings-form';
 import { ClearDataButton } from '@/components/settings/clear-data-button';
 
 export const metadata = {
-  title: 'Configuración | Sistema de Gestión de Pulpas',
+  title: 'Configuración | FrutyLab',
   description: 'Configuración del sistema',
 };
 

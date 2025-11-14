@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const metadata = {
-  title: 'Facturación | Sistema de Gestión de Pulpas',
+  title: 'Facturación | FrutyLab',
   description: 'Gestión de facturación',
 };
 

@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NewExpenseForm } from '@/components/expenses/new-expense-form';
 
 export const metadata = {
-  title: 'Nuevo Gasto | Sistema de Gestión de Pulpas',
+  title: 'Nuevo Gasto | FrutyLab',
 };
 
 export default function NewExpensePage() {

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NewLotForm } from '@/components/inventory/new-lot-form';
 
 export const metadata = {
-  title: 'Nueva Producción | Sistema de Gestión de Pulpas',
+  title: 'Nueva Producción | FrutyLab',
 };
 
 export default async function NewLotPage() {

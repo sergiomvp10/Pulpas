@@ -7,7 +7,7 @@ import { RecentSales } from '@/components/dashboard/recent-sales';
 import { TopProducts } from '@/components/dashboard/top-products';
 
 export const metadata = {
-  title: 'Dashboard | Sistema de Gestión de Pulpas',
+  title: 'Dashboard | FrutyLab',
   description: 'Panel de control del sistema de gestión de pulpas',
 };
 

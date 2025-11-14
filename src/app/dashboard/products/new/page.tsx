@@ -2,7 +2,7 @@ import { prisma } from '@/lib/db';
 import { NewProductForm } from '@/components/products/new-product-form';
 
 export const metadata = {
-  title: 'Nuevo Producto | Sistema de Gestión de Pulpas',
+  title: 'Nuevo Producto | FrutyLab',
   description: 'Crear nuevo producto',
 };
 

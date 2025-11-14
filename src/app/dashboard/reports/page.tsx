@@ -8,7 +8,7 @@ import { DailyRevenueChart } from '@/components/reports/daily-revenue-chart';
 import { nowColombia, toColombiaTime, colombiaTimeToUtc } from '@/lib/date-utils';
 
 export const metadata = {
-  title: 'Reportes | Sistema de Gestión de Pulpas',
+  title: 'Reportes | FrutyLab',
 };
 
 async function SalesReport() {

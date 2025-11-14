@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NewSellerForm } from '@/components/sellers/new-seller-form';
 
 export const metadata = {
-  title: 'Nuevo Vendedor | Sistema de Gestión de Pulpas',
+  title: 'Nuevo Vendedor | FrutyLab',
   description: 'Crear nuevo vendedor',
 };
 

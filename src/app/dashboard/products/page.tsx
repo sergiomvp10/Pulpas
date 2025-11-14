@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { ProductActions } from '@/components/products/product-actions';
 
 export const metadata = {
-  title: 'Productos | Sistema de Gestión de Pulpas',
+  title: 'Productos | FrutyLab',
 };
 
 async function ProductsList() {

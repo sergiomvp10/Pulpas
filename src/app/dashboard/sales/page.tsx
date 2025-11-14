@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { RecentSales } from '@/components/dashboard/recent-sales';
 
 export const metadata = {
-  title: 'Ventas | Sistema de Gestión de Pulpas',
+  title: 'Ventas | FrutyLab',
 };
 
 export default function SalesPage() {

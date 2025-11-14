@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ExpensesList } from '@/components/expenses/expenses-list';
 
 export const metadata = {
-  title: 'Gastos | Sistema de Gestión de Pulpas',
+  title: 'Gastos | FrutyLab',
 };
 
 export default function ExpensesPage() {

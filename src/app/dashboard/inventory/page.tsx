@@ -9,7 +9,7 @@ import { formatCurrency } from '@/lib/pricing';
 import { formatDateShortColombia, nowColombia } from '@/lib/date-utils';
 
 export const metadata = {
-  title: 'Inventario | Sistema de Gestión de Pulpas',
+  title: 'Inventario | FrutyLab',
 };
 
 async function InventoryList() {

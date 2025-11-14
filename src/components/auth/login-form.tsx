@@ -62,7 +62,7 @@ export function LoginForm() {
             <Input
               id="email"
               type="email"
-              placeholder="admin@pulpas.com"
+              placeholder="admin@frutylab.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -89,7 +89,7 @@ export function LoginForm() {
 
           <div className="mt-4 text-center text-sm text-gray-600">
             <p>Usuario de prueba:</p>
-            <p className="font-mono text-xs">admin@pulpas.com / admin123</p>
+            <p className="font-mono text-xs">admin@frutylab.com / admin123</p>
           </div>
         </form>
       </CardContent>

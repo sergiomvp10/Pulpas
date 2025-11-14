@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { CustomerActions } from '@/components/customers/customer-actions';
 
 export const metadata = {
-  title: 'Clientes | Sistema de Gestión de Pulpas',
+  title: 'Clientes | FrutyLab',
   description: 'Gestión de clientes',
 };
 

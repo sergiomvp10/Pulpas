@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { SellerActions } from '@/components/sellers/seller-actions';
 
 export const metadata = {
-  title: 'Vendedores | Sistema de Gestión de Pulpas',
+  title: 'Vendedores | FrutyLab',
   description: 'Gestión de vendedores',
 };
 
