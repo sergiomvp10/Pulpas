@@ -80,8 +80,15 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating lot:', error);
     return NextResponse.json(
-      { error: 'Failed to create lot' },
+      { 
+        error: 'Failed to create lot',
+        message: error instanceof Error ? error.message : String(error),
+        code: (error as any)?.code,
+        meta: (error as any)?.meta,
+      },
       { status: 500 }
     );
   }
 }
+
+export const runtime = 'nodejs';
