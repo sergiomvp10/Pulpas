@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "imports": {
-    "auth": "./auth.ts"
+    "auth": "./src/auth.ts"
   },
   "scripts": {
     "dev": "next dev --turbopack",
