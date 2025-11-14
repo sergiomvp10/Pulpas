@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       sequenceNumber,
     });
 
-    const lot = await prisma.$transaction(async (tx) => {
+    const lot = await prisma.$transaction(async (tx: any) => {
       const newLot = await tx.lot.create({
         data: {
           code,
