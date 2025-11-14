@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,6 +40,21 @@ const allNavItems = [
 export function DashboardNav({ user }: DashboardNavProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+  
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
   
   if (!user.role) {
     return null;
@@ -152,7 +167,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-30 md:hidden"
+          className="fixed inset-0 z-40 bg-black/10 md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
