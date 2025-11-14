@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { unstable_noStore as noStore } from 'next/cache';
 import { prisma } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +12,8 @@ export const metadata = {
 };
 
 async function ProductsList() {
+  noStore(); // Prevent caching to always show latest products
+  
   const products = await prisma.productBase.findMany({
     where: { active: true },
     include: {
@@ -23,51 +26,52 @@ async function ProductsList() {
     orderBy: { name: 'asc' },
   });
 
-  const tradicionales = products
-    .filter(p => p.category.name === 'Tradicional')
-    .sort((a, b) => a.name.localeCompare(b.name, 'es'));
-  
-  const exoticos = products
-    .filter(p => p.category.name === 'Exóticos')
-    .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  const productsByCategory = products.reduce((acc, product) => {
+    const categoryName = product.category.name;
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
+    }
+    acc[categoryName].push(product);
+    return acc;
+  }, {} as Record<string, typeof products>);
+
+  const sortedCategories = Object.keys(productsByCategory).sort((a, b) => {
+    if (a.includes('Tradicional')) return -1;
+    if (b.includes('Tradicional')) return 1;
+    if (a.includes('Exótico')) return -1;
+    if (b.includes('Exótico')) return 1;
+    return a.localeCompare(b, 'es');
+  });
 
   return (
     <div className="space-y-8">
-      {/* Tradicional Section */}
-      {tradicionales.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">TRADICIONAL</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {tradicionales.map((product: any) => (
-              <Card key={product.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg">{product.name}</CardTitle>
-                    <ProductActions productId={product.id} productName={product.name} />
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
+      {sortedCategories.map((categoryName) => {
+        const categoryProducts = productsByCategory[categoryName].sort((a, b) => 
+          a.name.localeCompare(b.name, 'es')
+        );
+        
+        return (
+          <div key={categoryName} className="space-y-4">
+            <h2 className="text-2xl font-bold text-gray-900">{categoryName.toUpperCase()}</h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {categoryProducts.map((product: any) => (
+                <Card key={product.id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <CardTitle className="text-lg">{product.name}</CardTitle>
+                      <ProductActions productId={product.id} productName={product.name} />
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-
-      {/* Exóticos Section */}
-      {exoticos.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">EXÓTICOS</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {exoticos.map((product: any) => (
-              <Card key={product.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg">{product.name}</CardTitle>
-                    <ProductActions productId={product.id} productName={product.name} />
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
+        );
+      })}
+      
+      {sortedCategories.length === 0 && (
+        <div className="text-center py-12 text-gray-500">
+          No hay productos registrados. Haz clic en "Añadir Producto" para crear uno.
         </div>
       )}
     </div>
