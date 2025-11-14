@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/db';
-import { calculateExpiryDate, generateLotCode, getNextLotSequence } from '@/lib/lot';
+import { calculateExpiryDate, generateLotCode } from '@/lib/lot';
+import { format } from 'date-fns';
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +38,28 @@ export async function POST(request: NextRequest) {
     const prodDate = new Date(productionDate);
     const expiryDate = calculateExpiryDate(prodDate, shelfLifeMonths);
 
-    const sequenceNumber = await getNextLotSequence(prisma, productVariantId, prodDate);
+    const dateStr = format(prodDate, 'yyyy-MM-dd');
+    const codePrefix = `${variant.productBase.skuRoot}-${dateStr}-L`;
+    
+    const existingLots = await prisma.lot.findMany({
+      where: {
+        code: {
+          startsWith: codePrefix,
+        },
+      },
+      select: {
+        code: true,
+      },
+    });
+
+    const sequences = existingLots
+      .map((lot) => {
+        const match = lot.code.match(/-L(\d+)$/);
+        return match ? parseInt(match[1], 10) : 0;
+      })
+      .filter((seq) => !isNaN(seq) && seq > 0);
+
+    const sequenceNumber = sequences.length > 0 ? Math.max(...sequences) + 1 : 1;
 
     const code = generateLotCode({
       productSku: variant.productBase.skuRoot,
