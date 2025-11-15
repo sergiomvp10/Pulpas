@@ -23,9 +23,20 @@ export function SellerMonthlySummary({ sellerId }: SellerMonthlySummaryProps) {
 
   useEffect(() => {
     async function fetchSummary() {
+      if (!sellerId) {
+        console.error('Seller ID is missing');
+        setError(true);
+        setLoading(false);
+        return;
+      }
+
       try {
-        const response = await fetch(`/api/sellers/${sellerId}/report?days=30`);
-        if (!response.ok) throw new Error('Failed to fetch');
+        const response = await fetch(`/api/sellers/${sellerId}/report?days=30&sellerId=${sellerId}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error fetching seller summary:', errorData);
+          throw new Error('Failed to fetch');
+        }
         
         const result = await response.json();
         setData({

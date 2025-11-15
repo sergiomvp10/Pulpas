@@ -23,7 +23,28 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const sellerId = params.id;
+    const url = request.nextUrl;
+    const fromParams = params?.id;
+    const fromQuery = url.searchParams.get('sellerId') ?? undefined;
+    const fromPath = url.pathname.match(/\/api\/sellers\/([^/]+)\/report/i)?.[1];
+    const sellerId = fromParams ?? fromQuery ?? fromPath;
+
+    if (!sellerId || sellerId === 'undefined') {
+      return NextResponse.json(
+        { 
+          error: 'Missing seller id',
+          message: 'Seller ID is required but was not provided',
+          debug: {
+            fromParams,
+            fromQuery,
+            fromPath,
+            pathname: url.pathname,
+          }
+        },
+        { status: 400 }
+      );
+    }
+
     const timezone = 'America/Bogota';
 
     const searchParams = request.nextUrl.searchParams;

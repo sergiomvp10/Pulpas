@@ -75,11 +75,20 @@ export function SellerReportModal({
   }, [open, sellerId]);
 
   async function fetchReport() {
+    if (!sellerId) {
+      setError('Falta ID de vendedor');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/sellers/${sellerId}/report?days=30`);
-      if (!response.ok) throw new Error('Failed to fetch report');
+      const response = await fetch(`/api/sellers/${sellerId}/report?days=30&sellerId=${sellerId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error fetching seller report:', errorData);
+        throw new Error(errorData.message || 'Failed to fetch report');
+      }
       
       const result = await response.json();
       setData(result);
