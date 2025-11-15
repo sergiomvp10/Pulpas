@@ -56,7 +56,7 @@ export async function GET(
         status: 'COMPLETED',
       },
       include: {
-        lines: {
+        saleLines: {
           include: {
             productVariant: {
               include: {
@@ -94,7 +94,7 @@ export async function GET(
     const productStats: Record<string, { name: string; weight: number; units: number; revenue: number }> = {};
 
     sales.forEach(sale => {
-      sale.saleLines.forEach(line => {
+      (sale.saleLines ?? []).forEach(line => {
         unitsSold += line.quantityUnits;
         
         const key = line.productVariantId;
@@ -168,7 +168,7 @@ export async function GET(
         saleNumber: sale.saleNumber,
         occurredAt: sale.occurredAt.toISOString(),
         totalAmountCents: sale.totalAmountCents,
-        itemCount: sale.saleLines.length,
+        itemCount: sale.saleLines?.length ?? 0,
       })),
     });
   } catch (error) {
@@ -177,6 +177,8 @@ export async function GET(
       { 
         error: 'Failed to fetch seller report',
         message: error instanceof Error ? error.message : String(error),
+        code: (error as any)?.code,
+        meta: (error as any)?.meta,
       },
       { status: 500 }
     );
