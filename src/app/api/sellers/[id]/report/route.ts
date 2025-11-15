@@ -94,7 +94,7 @@ export async function GET(
     const productStats: Record<string, { name: string; weight: number; units: number; revenue: number }> = {};
 
     sales.forEach(sale => {
-      sale.lines.forEach(line => {
+      sale.saleLines.forEach(line => {
         unitsSold += line.quantityUnits;
         
         const key = line.productVariantId;
@@ -168,7 +168,7 @@ export async function GET(
         saleNumber: sale.saleNumber,
         occurredAt: sale.occurredAt.toISOString(),
         totalAmountCents: sale.totalAmountCents,
-        itemCount: sale.lines.length,
+        itemCount: sale.saleLines.length,
       })),
     });
   } catch (error) {
