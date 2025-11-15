@@ -298,6 +298,7 @@ model Sale {
 
   @@index([occurredAt])
   @@index([sellerId])
+  @@index([sellerId, occurredAt])
   @@map("sales")
 }
 

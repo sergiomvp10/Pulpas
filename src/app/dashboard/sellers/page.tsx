@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { SellerActions } from '@/components/sellers/seller-actions';
+import { SellerCardWithReport } from '@/components/sellers/seller-card-with-report';
 
 export const metadata = {
   title: 'Vendedores | FrutyLab',
@@ -31,36 +32,7 @@ async function SellersList() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {sellers.map((seller: any) => (
-        <Card key={seller.id}>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-lg">{seller.name}</CardTitle>
-              </div>
-              <SellerActions sellerId={seller.id} sellerName={seller.name} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {seller.phone && (
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Teléfono:</span> {seller.phone}
-                </p>
-              )}
-              {seller.email && (
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Email:</span> {seller.email}
-                </p>
-              )}
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Comisión:</span> {(seller.commissionRate * 100).toFixed(1)}%
-              </p>
-              {seller.notes && (
-                <p className="text-sm text-gray-500 mt-2">{seller.notes}</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <SellerCardWithReport key={seller.id} seller={seller} />
       ))}
     </div>
   );
