@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SellerActions } from '@/components/sellers/seller-actions';
-import { SellerMonthlySummary } from '@/components/sellers/seller-monthly-summary';
 import { SellerReportModal } from '@/components/sellers/seller-report-modal';
 import { FileText } from 'lucide-react';
 
@@ -53,8 +52,6 @@ export function SellerCardWithReport({ seller }: SellerCardWithReportProps) {
             {seller.notes && (
               <p className="text-sm text-gray-500 mt-2">{seller.notes}</p>
             )}
-
-            <SellerMonthlySummary sellerId={seller.id} />
 
             <div className="pt-3">
               <Button
