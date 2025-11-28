@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus, Eye, EyeOff } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 
 interface User {
   id: string;
@@ -43,11 +43,9 @@ export function UserManagement() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
     role: 'PRODUCCION',
     phone: '',
   });
@@ -89,8 +87,10 @@ export function UserManagement() {
         throw new Error(data.error || 'Error al crear usuario');
       }
 
-      setSuccess(`Usuario "${data.name}" creado exitosamente con rol ${ROLE_LABELS[data.role]}`);
-      setFormData({ name: '', email: '', password: '', role: 'PRODUCCION', phone: '' });
+      const user = data.user;
+      const credentials = data.credentials;
+      setSuccess(`Usuario "${user.name}" creado con rol ${ROLE_LABELS[user.role]}. Contraseña generada: ${credentials.password}`);
+      setFormData({ name: '', email: '', role: 'PRODUCCION', phone: '' });
       setShowForm(false);
       await fetchUsers();
     } catch (err) {
@@ -158,30 +158,6 @@ export function UserManagement() {
                 placeholder="Ej: juan@empresa.com"
                 required
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña *</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Mínimo 6 caracteres"
-                  required
-                  minLength={6}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
             </div>
 
             <div className="space-y-2">

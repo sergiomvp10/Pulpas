@@ -3,6 +3,12 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/db';
 import * as bcrypt from 'bcrypt';
 
+function generatePassword(name: string): string {
+  const firstName = name.split(' ')[0].toLowerCase();
+  const randomDigits = Math.floor(Math.random() * 90 + 10); // 10-99
+  return `${firstName}${randomDigits}`;
+}
+
 export async function GET(_request: NextRequest) {
   try {
     const session = await auth();
@@ -39,11 +45,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, password, role, phone } = body;
+    const { name, email, role, phone } = body;
 
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !role) {
       return NextResponse.json(
-        { error: 'Nombre, email, contraseña y rol son requeridos' },
+        { error: 'Nombre, email y rol son requeridos' },
         { status: 400 }
       );
     }
@@ -60,8 +66,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, 10);
+    // Generate password automatically
+    const generatedPassword = generatePassword(name);
+    const passwordHash = await bcrypt.hash(generatedPassword, 10);
 
     const user = await prisma.user.create({
       data: {
@@ -81,9 +88,16 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(user, { status: 201 });
+    return NextResponse.json({
+      user,
+      credentials: {
+        email: user.email,
+        password: generatedPassword,
+      },
+    }, { status: 201 });
   } catch (error) {
     console.error('Error creating user:', error);
-    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create user';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
