@@ -24,8 +24,21 @@ export async function POST(request: NextRequest) {
     }
 
     const sale = await prisma.$transaction(async (tx: any) => {
-      const saleCount = await tx.sale.count();
-      const saleNumber = `V-${String(saleCount + 1).padStart(6, '0')}`;
+      // Find the last sale by saleNumber to get the next sequence
+      const lastSale = await tx.sale.findFirst({
+        orderBy: { saleNumber: 'desc' },
+        select: { saleNumber: true },
+      });
+
+      let nextSequence = 1;
+      if (lastSale) {
+        const match = lastSale.saleNumber.match(/^V-(\d+)$/);
+        if (match) {
+          nextSequence = parseInt(match[1], 10) + 1;
+        }
+      }
+
+      const saleNumber = `V-${String(nextSequence).padStart(6, '0')}`;
 
       const totalAmountCents = (lines as SaleLine[]).reduce(
         (sum: number, line: SaleLine) => sum + line.quantity * line.unitPriceCents,

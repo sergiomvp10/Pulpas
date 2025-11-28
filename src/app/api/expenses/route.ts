@@ -63,8 +63,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const expenseCount = await prisma.expense.count();
-    const expenseNumber = `G-${String(expenseCount + 1).padStart(6, '0')}`;
+    // Find the last expense by expenseNumber to get the next sequence
+    const lastExpense = await prisma.expense.findFirst({
+      orderBy: { expenseNumber: 'desc' },
+      select: { expenseNumber: true },
+    });
+
+    let nextSequence = 1;
+    if (lastExpense) {
+      const match = lastExpense.expenseNumber.match(/^G-(\d+)$/);
+      if (match) {
+        nextSequence = parseInt(match[1], 10) + 1;
+      }
+    }
+
+    const expenseNumber = `G-${String(nextSequence).padStart(6, '0')}`;
 
     const expense = await prisma.expense.create({
       data: {
