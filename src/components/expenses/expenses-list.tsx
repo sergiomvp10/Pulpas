@@ -19,6 +19,7 @@ interface Expense {
   amountCents: number;
   paymentMethod: string;
   expenseDate: string;
+  createdAt: string;
   notes: string | null;
   createdBy: {
     id: string;
@@ -210,7 +211,7 @@ export function ExpensesList() {
                       <Badge variant="outline">{CATEGORY_LABELS[expense.category]}</Badge>
                     </div>
                     <p className="text-sm text-gray-500 mt-1">
-                      {formatDateTimeColombia(new Date(expense.expenseDate))} • {PAYMENT_METHOD_LABELS[expense.paymentMethod]}
+                      {formatDateTimeColombia(expense.createdAt)} • {PAYMENT_METHOD_LABELS[expense.paymentMethod]}
                     </p>
                     {expense.notes && (
                       <p className="text-sm text-gray-600 mt-1">{expense.notes}</p>
