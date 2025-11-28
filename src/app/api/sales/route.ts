@@ -24,20 +24,24 @@ export async function POST(request: NextRequest) {
     }
 
     const sale = await prisma.$transaction(async (tx: any) => {
-      // Find the last sale by saleNumber to get the next sequence
-      const lastSale = await tx.sale.findFirst({
-        orderBy: { saleNumber: 'desc' },
+      // Find the maximum sale number sequence by scanning existing sales
+      // This handles cases where some sale numbers don't match the V-###### pattern
+      const existingSales = await tx.sale.findMany({
         select: { saleNumber: true },
       });
 
-      let nextSequence = 1;
-      if (lastSale) {
-        const match = lastSale.saleNumber.match(/^V-(\d+)$/);
+      let maxSequence = 0;
+      for (const sale of existingSales) {
+        const match = sale.saleNumber?.match(/^V-(\d+)$/);
         if (match) {
-          nextSequence = parseInt(match[1], 10) + 1;
+          const seq = parseInt(match[1], 10);
+          if (seq > maxSequence) {
+            maxSequence = seq;
+          }
         }
       }
 
+      const nextSequence = maxSequence + 1;
       const saleNumber = `V-${String(nextSequence).padStart(6, '0')}`;
 
       const totalAmountCents = (lines as SaleLine[]).reduce(
