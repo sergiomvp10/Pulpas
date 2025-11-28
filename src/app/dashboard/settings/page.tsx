@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SettingsForm } from '@/components/settings/settings-form';
 import { ClearDataButton } from '@/components/settings/clear-data-button';
+import { UserManagement } from '@/components/settings/user-management';
 
 export const metadata = {
   title: 'Configuración | FrutyLab',
@@ -25,6 +26,18 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <SettingsForm />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Gestión de Usuarios</CardTitle>
+            <CardDescription>
+              Crea y administra usuarios del sistema. Asigna roles para controlar el acceso a diferentes módulos.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <UserManagement />
           </CardContent>
         </Card>
 
