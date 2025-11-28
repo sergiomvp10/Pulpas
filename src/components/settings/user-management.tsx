@@ -65,6 +65,11 @@ export function UserManagement() {
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Selection state
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  const selectedUser = users.find(u => u.id === selectedUserId) || null;
+
   const fetchUsers = async () => {
     try {
       const response = await fetch('/api/admin/users');
@@ -115,16 +120,22 @@ export function UserManagement() {
     }
   };
 
-  const handleEdit = (user: User) => {
-    setEditingUser(user);
+  const handleEditClick = () => {
+    if (!selectedUser) return;
+    setEditingUser(selectedUser);
     setEditForm({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      phone: user.phone || '',
+      name: selectedUser.name,
+      email: selectedUser.email,
+      role: selectedUser.role,
+      phone: selectedUser.phone || '',
     });
     setError('');
     setSuccess('');
+  };
+
+  const handleDeleteClick = () => {
+    if (!selectedUser) return;
+    setDeletingUser(selectedUser);
   };
 
   const handleEditSubmit = async () => {
@@ -202,18 +213,40 @@ export function UserManagement() {
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">{users.length} usuario(s) registrado(s)</p>
-        <Button
-          variant={showForm ? "outline" : "default"}
-          size="sm"
-          onClick={() => {
-            setShowForm(!showForm);
-            setError('');
-            setSuccess('');
-          }}
-        >
-          <UserPlus className="h-4 w-4 mr-2" />
-          {showForm ? 'Cancelar' : 'Nuevo Usuario'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleEditClick}
+            disabled={!selectedUser}
+            title={selectedUser ? `Editar ${selectedUser.name}` : 'Selecciona un usuario para editar'}
+            className="h-9 w-9"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleDeleteClick}
+            disabled={!selectedUser}
+            title={selectedUser ? `Eliminar ${selectedUser.name}` : 'Selecciona un usuario para eliminar'}
+            className="h-9 w-9"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={showForm ? "outline" : "default"}
+            size="sm"
+            onClick={() => {
+              setShowForm(!showForm);
+              setError('');
+              setSuccess('');
+            }}
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            {showForm ? 'Cancelar' : 'Nuevo Usuario'}
+          </Button>
+        </div>
       </div>
 
       {showForm && (
@@ -288,34 +321,20 @@ export function UserManagement() {
         {users.map((user) => (
           <div
             key={user.id}
-            className="flex items-center justify-between p-3 border rounded-lg bg-white"
+            onClick={() => setSelectedUserId(selectedUserId === user.id ? null : user.id)}
+            className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+              selectedUserId === user.id
+                ? 'bg-blue-50 border-blue-300 ring-2 ring-blue-200'
+                : 'bg-white hover:bg-gray-50'
+            }`}
           >
             <div>
               <p className="font-medium">{user.name}</p>
               <p className="text-sm text-gray-500">{user.email}</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleEdit(user)}
-                title="Editar usuario"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setDeletingUser(user)}
-                title="Eliminar usuario"
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-              <Badge className={ROLE_COLORS[user.role] || 'bg-gray-100 text-gray-800'}>
-                {ROLE_LABELS[user.role] || user.role}
-              </Badge>
-            </div>
+            <Badge className={ROLE_COLORS[user.role] || 'bg-gray-100 text-gray-800'}>
+              {ROLE_LABELS[user.role] || user.role}
+            </Badge>
           </div>
         ))}
       </div>
