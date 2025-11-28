@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
 import { differenceInDays } from 'date-fns';
 import { formatCurrency } from '@/lib/pricing';
-import { formatDateShortColombia } from '@/lib/date-utils';
+import { formatDateShortColombia, nowColombia } from '@/lib/date-utils';
 import { Pencil, Trash2 } from 'lucide-react';
 
 interface Location {
@@ -163,10 +163,6 @@ export function InventoryList() {
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  const nowColombia = () => {
-    return new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Bogota' }));
   };
 
   if (isLoading) {
@@ -331,14 +327,14 @@ export function InventoryList() {
               <div className="space-y-2">
                 <Label htmlFor="locationId">Ubicación</Label>
                 <Select
-                  value={editForm.locationId}
-                  onValueChange={(value) => setEditForm({ ...editForm, locationId: value })}
+                  value={editForm.locationId || 'none'}
+                  onValueChange={(value) => setEditForm({ ...editForm, locationId: value === 'none' ? '' : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar ubicación" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sin ubicación</SelectItem>
+                    <SelectItem value="none">Sin ubicación</SelectItem>
                     {locations.map((location) => (
                       <SelectItem key={location.id} value={location.id}>
                         {location.name}
