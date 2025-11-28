@@ -31,6 +31,21 @@ export const authConfig = {
             return Response.redirect(new URL('/dashboard', nextUrl));
           }
         }
+
+        if (userRole === 'PRODUCCION') {
+          const allowedPaths = [
+            '/dashboard/inventory',
+            '/dashboard/inventory/new',
+          ];
+          
+          const isAllowed = allowedPaths.some(path => 
+            nextUrl.pathname === path || nextUrl.pathname.startsWith(path + '/')
+          );
+          
+          if (!isAllowed) {
+            return Response.redirect(new URL('/dashboard/inventory', nextUrl));
+          }
+        }
         
         return true;
       } else if (isLoggedIn && isOnLogin) {

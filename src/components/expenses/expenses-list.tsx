@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/pricing';
 import { formatDateTimeColombia } from '@/lib/date-utils';
-import { Pencil, Trash2, Calendar } from 'lucide-react';
+import { Trash2, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Expense {
   id: string;
@@ -48,6 +48,7 @@ export function ExpensesList() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
 
   useEffect(() => {
     fetchExpenses();
@@ -193,14 +194,36 @@ export function ExpensesList() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Historial de Gastos</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Historial de Gastos</CardTitle>
+            {expenses.length > 1 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+                className="flex items-center gap-1"
+              >
+                {isHistoryExpanded ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Mostrar menos
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Ver todos ({expenses.length})
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {expenses.length === 0 ? (
             <p className="text-center text-gray-500 py-8">No hay gastos registrados</p>
           ) : (
             <div className="space-y-4">
-              {expenses.map((expense) => (
+              {(isHistoryExpanded ? expenses : expenses.slice(0, 1)).map((expense) => (
                 <div
                   key={expense.id}
                   className="flex items-center justify-between border-b pb-4 last:border-0"

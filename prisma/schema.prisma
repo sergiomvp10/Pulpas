@@ -43,6 +43,7 @@ enum UserRole {
   ALMACEN
   CALIDAD
   VENTAS
+  PRODUCCION
 }
 
 // ============================================
