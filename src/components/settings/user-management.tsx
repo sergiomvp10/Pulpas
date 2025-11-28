@@ -7,13 +7,15 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { UserPlus, Pencil, Trash2 } from 'lucide-react';
 
 interface User {
   id: string;
   name: string;
   email: string;
   role: string;
+  phone?: string;
   isActive: boolean;
   createdAt: string;
 }
@@ -49,6 +51,19 @@ export function UserManagement() {
     role: 'PRODUCCION',
     phone: '',
   });
+
+  // Edit state
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    role: '',
+    phone: '',
+  });
+
+  // Delete state
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -97,6 +112,73 @@ export function UserManagement() {
       setError(err instanceof Error ? err.message : 'Error al crear usuario');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setEditForm({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      phone: user.phone || '',
+    });
+    setError('');
+    setSuccess('');
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editingUser) return;
+    setIsSaving(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al actualizar usuario');
+      }
+
+      setSuccess(`Usuario "${data.name}" actualizado correctamente`);
+      setEditingUser(null);
+      await fetchUsers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al actualizar usuario');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deletingUser) return;
+    setIsDeleting(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/api/admin/users/${deletingUser.id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al eliminar usuario');
+      }
+
+      setSuccess(`Usuario "${deletingUser.name}" eliminado correctamente`);
+      setDeletingUser(null);
+      await fetchUsers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al eliminar usuario');
+      setDeletingUser(null);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -212,12 +294,117 @@ export function UserManagement() {
               <p className="font-medium">{user.name}</p>
               <p className="text-sm text-gray-500">{user.email}</p>
             </div>
-            <Badge className={ROLE_COLORS[user.role] || 'bg-gray-100 text-gray-800'}>
-              {ROLE_LABELS[user.role] || user.role}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEdit(user)}
+                title="Editar usuario"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setDeletingUser(user)}
+                title="Eliminar usuario"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+              <Badge className={ROLE_COLORS[user.role] || 'bg-gray-100 text-gray-800'}>
+                {ROLE_LABELS[user.role] || user.role}
+              </Badge>
+            </div>
           </div>
         ))}
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Usuario</DialogTitle>
+            <DialogDescription>
+              Modifica los datos del usuario
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Nombre completo</Label>
+              <Input
+                id="edit-name"
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-email">Email</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-role">Rol</Label>
+              <Select
+                value={editForm.role}
+                onValueChange={(value) => setEditForm({ ...editForm, role: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PRODUCCION">Producción (solo inventario)</SelectItem>
+                  <SelectItem value="VENTAS">Ventas</SelectItem>
+                  <SelectItem value="ALMACEN">Almacén</SelectItem>
+                  <SelectItem value="CALIDAD">Calidad</SelectItem>
+                  <SelectItem value="SELLER">Vendedor</SelectItem>
+                  <SelectItem value="ADMIN">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-phone">Teléfono</Label>
+              <Input
+                id="edit-phone"
+                value={editForm.phone}
+                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingUser(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleEditSubmit} disabled={isSaving}>
+              {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deletingUser} onOpenChange={(open) => !open && setDeletingUser(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Eliminar Usuario</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que deseas eliminar al usuario &quot;{deletingUser?.name}&quot;? Esta acción no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletingUser(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? 'Eliminando...' : 'Eliminar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
