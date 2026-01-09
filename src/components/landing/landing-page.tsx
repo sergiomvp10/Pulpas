@@ -58,40 +58,40 @@ export function LandingPage({ config }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-sm shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md shadow-md">
+        <div className="w-full px-6 sm:px-10 lg:px-16">
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center gap-3">
               <Image
                 src="/frutylab-logo.png"
                 alt="FrutyLab"
-                width={40}
-                height={40}
-                className="w-10 h-10"
+                width={56}
+                height={56}
+                className="w-14 h-14"
               />
-              <span className="text-xl font-bold text-green-600">FrutyLab</span>
+              <span className="text-2xl font-bold text-green-600">FrutyLab</span>
             </div>
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-10">
               <button
                 onClick={() => scrollToSection('hero')}
-                className="text-gray-600 hover:text-green-600 transition-colors"
+                className="text-lg font-medium text-gray-700 hover:text-green-600 transition-colors"
               >
                 Inicio
               </button>
               <button
                 onClick={() => scrollToSection('contact')}
-                className="text-gray-600 hover:text-green-600 transition-colors"
+                className="text-lg font-medium text-gray-700 hover:text-green-600 transition-colors"
               >
                 Contacto
               </button>
               <button
                 onClick={() => scrollToSection('work-with-us')}
-                className="text-gray-600 hover:text-green-600 transition-colors"
+                className="text-lg font-medium text-gray-700 hover:text-green-600 transition-colors"
               >
                 Trabaja con Nosotros
               </button>
               <Link href="/login">
-                <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
+                <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 text-lg px-6 py-2">
                   Iniciar Sesión
                 </Button>
               </Link>
