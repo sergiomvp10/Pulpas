@@ -14,16 +14,23 @@ interface ProductVariant {
   id: string;
   sku: string;
   gramWeightG: number;
+  pricePerUnit: number;
   manualPriceCents: number | null;
   productBase: {
     name: string;
     category: {
       defaultMargin: number;
+      pricePerGram: number;
     };
   };
 }
 
 interface Customer {
+  id: string;
+  name: string;
+}
+
+interface Seller {
   id: string;
   name: string;
 }
@@ -37,13 +44,16 @@ interface SaleLine {
 interface NewSaleFormProps {
   productVariants: ProductVariant[];
   customers: Customer[];
+  sellers?: Seller[];
+  userRole: string;
 }
 
-export function NewSaleForm({ productVariants, customers }: NewSaleFormProps) {
+export function NewSaleForm({ productVariants, customers, sellers, userRole }: NewSaleFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [customerId, setCustomerId] = useState('');
+  const [sellerId, setSellerId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [saleLines, setSaleLines] = useState<SaleLine[]>([]);
   const [currentLine, setCurrentLine] = useState({
@@ -96,6 +106,7 @@ export function NewSaleForm({ productVariants, customers }: NewSaleFormProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerId: customerId || null,
+          sellerId: sellerId || null,
           paymentMethod,
           lines: saleLines.map(line => ({
             productVariantId: line.productVariantId,
@@ -126,7 +137,7 @@ export function NewSaleForm({ productVariants, customers }: NewSaleFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} autoComplete="off" className="space-y-6">
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
@@ -141,7 +152,7 @@ export function NewSaleForm({ productVariants, customers }: NewSaleFormProps) {
               <SelectValue placeholder="Selecciona un cliente" />
             </SelectTrigger>
             <SelectContent>
-              {customers.map((customer) => (
+              {customers.map((customer: any) => (
                 <SelectItem key={customer.id} value={customer.id}>
                   {customer.name}
                 </SelectItem>
@@ -149,6 +160,24 @@ export function NewSaleForm({ productVariants, customers }: NewSaleFormProps) {
             </SelectContent>
           </Select>
         </div>
+
+        {userRole === 'ADMIN' && sellers && sellers.length > 0 && (
+          <div className="space-y-2">
+            <Label htmlFor="sellerId">Vendedor (opcional)</Label>
+            <Select value={sellerId} onValueChange={setSellerId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona un vendedor" />
+              </SelectTrigger>
+              <SelectContent>
+                {sellers.map((seller: any) => (
+                  <SelectItem key={seller.id} value={seller.id}>
+                    {seller.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="paymentMethod">Método de Pago *</Label>
@@ -176,7 +205,36 @@ export function NewSaleForm({ productVariants, customers }: NewSaleFormProps) {
                 <Label>Producto</Label>
                 <Select
                   value={currentLine.productVariantId}
-                  onValueChange={(value) => setCurrentLine({ ...currentLine, productVariantId: value })}
+                  onValueChange={(value) => {
+                    const selectedVariant = productVariants.find(v => v.id === value);
+                    if (selectedVariant) {
+                      let price = 0;
+                      
+                      if (selectedVariant.manualPriceCents && selectedVariant.manualPriceCents > 0) {
+                        price = selectedVariant.manualPriceCents / 100;
+                      }
+                      else if (Number(selectedVariant.pricePerUnit) > 0) {
+                        price = Number(selectedVariant.pricePerUnit);
+                      }
+                      else {
+                        const pricePerGram = selectedVariant.productBase.category.pricePerGram;
+                        const gramWeight = selectedVariant.gramWeightG;
+                        price = gramWeight * pricePerGram;
+                      }
+                      
+                      setCurrentLine({ 
+                        ...currentLine, 
+                        productVariantId: value,
+                        unitPrice: price.toString(),
+                      });
+                    } else {
+                      setCurrentLine({ 
+                        ...currentLine, 
+                        productVariantId: value,
+                        unitPrice: '',
+                      });
+                    }
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona producto" />

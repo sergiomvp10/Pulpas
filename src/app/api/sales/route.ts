@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/../../auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/db';
 import { allocateLotsWithFEFO } from '@/lib/fefo';
 
@@ -23,19 +23,54 @@ export async function POST(request: NextRequest) {
       unitPriceCents: number;
     }
 
-    const sale = await prisma.$transaction(async (tx) => {
-      const saleCount = await tx.sale.count();
-      const saleNumber = `V-${String(saleCount + 1).padStart(6, '0')}`;
+    const sale = await prisma.$transaction(async (tx: any) => {
+      // Find the maximum sale number sequence by scanning existing sales
+      // This handles cases where some sale numbers don't match the V-###### pattern
+      const existingSales = await tx.sale.findMany({
+        select: { saleNumber: true },
+      });
+
+      let maxSequence = 0;
+      for (const sale of existingSales) {
+        const match = sale.saleNumber?.match(/^V-(\d+)$/);
+        if (match) {
+          const seq = parseInt(match[1], 10);
+          if (seq > maxSequence) {
+            maxSequence = seq;
+          }
+        }
+      }
+
+      const nextSequence = maxSequence + 1;
+      const saleNumber = `V-${String(nextSequence).padStart(6, '0')}`;
 
       const totalAmountCents = (lines as SaleLine[]).reduce(
         (sum: number, line: SaleLine) => sum + line.quantity * line.unitPriceCents,
         0
       );
 
+      let sellerId = null;
+      if (session.user.role === 'SELLER') {
+        const seller = await tx.seller.findUnique({
+          where: { userId: session.user.id },
+        });
+        if (seller) {
+          sellerId = seller.id;
+        }
+      } else if (session.user.role === 'ADMIN' && body.sellerId) {
+        const seller = await tx.seller.findUnique({
+          where: { id: body.sellerId, active: true },
+        });
+        if (seller) {
+          sellerId = seller.id;
+        }
+      }
+
       const newSale = await tx.sale.create({
         data: {
           saleNumber,
           customerId: customerId || null,
+          sellerId,
           paymentMethod,
           totalAmountCents,
           status: 'COMPLETED',

@@ -12,6 +12,7 @@ interface ProductVariant {
   id: string;
   sku: string;
   gramWeightG: number;
+  pricePerUnit: number;
   productBase: {
     name: string;
   };
@@ -83,7 +84,14 @@ export function NewLotForm({ productVariants, locations }: NewLotFormProps) {
         <Label htmlFor="productVariantId">Producto *</Label>
         <Select
           value={formData.productVariantId}
-          onValueChange={(value) => setFormData({ ...formData, productVariantId: value })}
+          onValueChange={(value) => {
+            const selectedVariant = productVariants.find(v => v.id === value);
+            setFormData({ 
+              ...formData, 
+              productVariantId: value,
+              costPerUnit: selectedVariant ? selectedVariant.pricePerUnit.toString() : '',
+            });
+          }}
           required
         >
           <SelectTrigger>

@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 // ============================================
@@ -15,30 +16,36 @@ datasource db {
 // ============================================
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  phone         String?
-  role          UserRole  @default(ADMIN)
-  passwordHash  String    @map("password_hash")
-  isActive      Boolean   @default(true) @map("is_active")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  role         UserRole @default(ADMIN)
+  passwordHash String   @map("password_hash")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   // Relations
-  lotsCreated         Lot[]               @relation("LotCreatedBy")
-  inventoryMovements  InventoryMovement[] @relation("MovementCreatedBy")
-  qcChecks            QCCheck[]           @relation("QCCheckedBy")
-  salesCreated        Sale[]              @relation("SaleCreatedBy")
+  seller             Seller?             @relation("SellerUser")
+  lotsCreated        Lot[]               @relation("LotCreatedBy")
+  inventoryMovements InventoryMovement[] @relation("MovementCreatedBy")
+  qcChecks           QCCheck[]           @relation("QCCheckedBy")
+  salesCreated       Sale[]              @relation("SaleCreatedBy")
+  expensesCreated    Expense[]           @relation("ExpenseCreatedBy")
+  employeeNotesCreated    EmployeeNote[]    @relation("EmployeeNoteCreatedBy")
+  employeePaymentsCreated EmployeePayment[] @relation("EmployeePaymentCreatedBy")
 
   @@map("users")
 }
 
 enum UserRole {
   ADMIN
+  SELLER
   ALMACEN
   CALIDAD
   VENTAS
+  PRODUCCION
 }
 
 // ============================================
@@ -50,7 +57,9 @@ model Customer {
   name      String
   phone     String
   email     String?
+  city      String?
   notes     String?
+  active    Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -61,17 +70,41 @@ model Customer {
 }
 
 // ============================================
+// SELLERS
+// ============================================
+
+model Seller {
+  id             String   @id @default(cuid())
+  name           String
+  phone          String
+  email          String
+  userId         String?  @unique @map("user_id")
+  commissionRate Float    @default(0.0) @map("commission_rate")
+  notes          String?
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user  User?  @relation("SellerUser", fields: [userId], references: [id])
+  sales Sale[] @relation("SellerSales")
+
+  @@map("sellers")
+}
+
+// ============================================
 // PRODUCTS
 // ============================================
 
 model Category {
-  id             String   @id @default(cuid())
-  name           String   @unique
-  defaultMargin  Float    @map("default_margin")
-  description    String?
-  active         Boolean  @default(true)
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id            String   @id @default(cuid())
+  name          String   @unique
+  pricePerGram  Float    @default(10.0) @map("price_per_gram")
+  defaultMargin Float    @map("default_margin")
+  description   String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   // Relations
   productBases ProductBase[]
@@ -91,24 +124,25 @@ model ProductBase {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  category Category          @relation(fields: [categoryId], references: [id])
+  category Category         @relation(fields: [categoryId], references: [id])
   variants ProductVariant[]
 
   @@map("product_bases")
 }
 
 model ProductVariant {
-  id                String   @id @default(cuid())
-  productBaseId     String   @map("product_base_id")
-  gramWeightG       Int      @map("gram_weight_g")
-  sku               String   @unique
-  barcode           String?
-  photoUrl          String?  @map("photo_url")
-  marginOverride    Float?   @map("margin_override")
-  manualPriceCents  Int?     @map("manual_price_cents")
-  active            Boolean  @default(true)
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  id               String   @id @default(cuid())
+  productBaseId    String   @map("product_base_id")
+  gramWeightG      Int      @map("gram_weight_g")
+  sku              String   @unique
+  barcode          String?
+  photoUrl         String?  @map("photo_url")
+  pricePerUnit     Float    @default(0) @map("price_per_unit")
+  marginOverride   Float?   @map("margin_override")
+  manualPriceCents Int?     @map("manual_price_cents")
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   // Relations
   productBase ProductBase @relation(fields: [productBaseId], references: [id])
@@ -139,20 +173,20 @@ model InventoryLocation {
 }
 
 model Lot {
-  id                 String    @id @default(cuid())
-  code               String    @unique
-  productVariantId   String    @map("product_variant_id")
-  productionDate     DateTime  @map("production_date")
-  expiryDate         DateTime  @map("expiry_date")
-  unitsInitial       Int       @map("units_initial")
-  unitsOnHand        Int       @map("units_on_hand")
-  costPerUnitCents   Int       @map("cost_per_unit_cents")
-  status             LotStatus @default(APPROVED)
-  locationId         String?   @map("location_id")
-  notes              String?
-  createdById        String    @map("created_by_id")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
+  id               String    @id @default(cuid())
+  code             String    @unique
+  productVariantId String    @map("product_variant_id")
+  productionDate   DateTime  @map("production_date")
+  expiryDate       DateTime  @map("expiry_date")
+  unitsInitial     Int       @map("units_initial")
+  unitsOnHand      Int       @map("units_on_hand")
+  costPerUnitCents Int       @map("cost_per_unit_cents")
+  status           LotStatus @default(APPROVED)
+  locationId       String?   @map("location_id")
+  notes            String?
+  createdById      String    @map("created_by_id")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
   // Relations
   productVariant     ProductVariant      @relation(fields: [productVariantId], references: [id])
@@ -175,15 +209,15 @@ enum LotStatus {
 }
 
 model InventoryMovement {
-  id            String               @id @default(cuid())
-  lotId         String               @map("lot_id")
+  id            String                @id @default(cuid())
+  lotId         String                @map("lot_id")
   type          InventoryMovementType
-  quantityUnits Int                  @map("quantity_units")
-  referenceType ReferenceType?       @map("reference_type")
-  referenceId   String?              @map("reference_id")
+  quantityUnits Int                   @map("quantity_units")
+  referenceType ReferenceType?        @map("reference_type")
+  referenceId   String?               @map("reference_id")
   notes         String?
-  createdById   String               @map("created_by_id")
-  createdAt     DateTime             @default(now()) @map("created_at")
+  createdById   String                @map("created_by_id")
+  createdAt     DateTime              @default(now()) @map("created_at")
 
   // Relations
   lot       Lot  @relation(fields: [lotId], references: [id])
@@ -214,15 +248,15 @@ enum ReferenceType {
 // ============================================
 
 model QCCheck {
-  id          String    @id @default(cuid())
-  lotId       String    @map("lot_id")
+  id          String   @id @default(cuid())
+  lotId       String   @map("lot_id")
   brix        Float?
   ph          Float?
   temperature Float?
   status      QCStatus
   notes       String?
-  checkedById String    @map("checked_by_id")
-  checkedAt   DateTime  @default(now()) @map("checked_at")
+  checkedById String   @map("checked_by_id")
+  checkedAt   DateTime @default(now()) @map("checked_at")
 
   // Relations
   lot       Lot  @relation(fields: [lotId], references: [id])
@@ -242,28 +276,32 @@ enum QCStatus {
 // ============================================
 
 model Sale {
-  id              String        @id @default(cuid())
-  saleNumber      String        @unique @map("sale_number")
-  occurredAt      DateTime      @default(now()) @map("occurred_at")
-  customerId      String?       @map("customer_id")
-  channel         SaleChannel   @default(MANUAL)
-  paymentMethod   PaymentMethod @map("payment_method")
-  status          SaleStatus    @default(COMPLETED)
-  totalAmountCents Int          @map("total_amount_cents")
-  currency        String        @default("COP")
-  dueDate         DateTime?     @map("due_date")
-  paidAt          DateTime?     @map("paid_at")
-  notes           String?
-  createdById     String        @map("created_by_id")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
+  id               String        @id @default(cuid())
+  saleNumber       String        @unique @map("sale_number")
+  occurredAt       DateTime      @default(now()) @map("occurred_at")
+  customerId       String?       @map("customer_id")
+  sellerId         String?       @map("seller_id")
+  channel          SaleChannel   @default(MANUAL)
+  paymentMethod    PaymentMethod @map("payment_method")
+  status           SaleStatus    @default(COMPLETED)
+  totalAmountCents Int           @map("total_amount_cents")
+  currency         String        @default("COP")
+  dueDate          DateTime?     @map("due_date")
+  paidAt           DateTime?     @map("paid_at")
+  notes            String?
+  createdById      String        @map("created_by_id")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
 
   // Relations
   customer  Customer?  @relation(fields: [customerId], references: [id])
+  seller    Seller?    @relation("SellerSales", fields: [sellerId], references: [id])
   createdBy User       @relation("SaleCreatedBy", fields: [createdById], references: [id])
   saleLines SaleLine[]
 
   @@index([occurredAt])
+  @@index([sellerId])
+  @@index([sellerId, occurredAt])
   @@map("sales")
 }
 
@@ -285,28 +323,28 @@ enum SaleStatus {
 }
 
 model SaleLine {
-  id               String   @id @default(cuid())
-  saleId           String   @map("sale_id")
-  productVariantId String   @map("product_variant_id")
-  quantityUnits    Int      @map("quantity_units")
-  unitPriceCents   Int      @map("unit_price_cents")
-  discountCents    Int      @default(0) @map("discount_cents")
-  subtotalCents    Int      @map("subtotal_cents")
+  id               String @id @default(cuid())
+  saleId           String @map("sale_id")
+  productVariantId String @map("product_variant_id")
+  quantityUnits    Int    @map("quantity_units")
+  unitPriceCents   Int    @map("unit_price_cents")
+  discountCents    Int    @default(0) @map("discount_cents")
+  subtotalCents    Int    @map("subtotal_cents")
 
   // Relations
-  sale           Sale            @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  productVariant ProductVariant  @relation(fields: [productVariantId], references: [id])
+  sale           Sale           @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productVariant ProductVariant @relation(fields: [productVariantId], references: [id])
   saleLineLots   SaleLineLot[]
 
   @@map("sale_lines")
 }
 
 model SaleLineLot {
-  id                    String @id @default(cuid())
-  saleLineId            String @map("sale_line_id")
-  lotId                 String @map("lot_id")
-  quantityUnits         Int    @map("quantity_units")
-  costUnitCentsAtSale   Int    @map("cost_unit_cents_at_sale")
+  id                  String @id @default(cuid())
+  saleLineId          String @map("sale_line_id")
+  lotId               String @map("lot_id")
+  quantityUnits       Int    @map("quantity_units")
+  costUnitCentsAtSale Int    @map("cost_unit_cents_at_sale")
 
   // Relations
   saleLine SaleLine @relation(fields: [saleLineId], references: [id], onDelete: Cascade)
@@ -320,16 +358,16 @@ model SaleLineLot {
 // ============================================
 
 model NotificationLog {
-  id           String             @id @default(cuid())
+  id           String              @id @default(cuid())
   type         NotificationType
-  lotId        String?            @map("lot_id")
-  scheduledFor DateTime           @map("scheduled_for")
-  sentAt       DateTime?          @map("sent_at")
+  lotId        String?             @map("lot_id")
+  scheduledFor DateTime            @map("scheduled_for")
+  sentAt       DateTime?           @map("sent_at")
   recipient    String
   channel      NotificationChannel
-  status       NotificationStatus @default(QUEUED)
+  status       NotificationStatus  @default(QUEUED)
   error        String?
-  createdAt    DateTime           @default(now()) @map("created_at")
+  createdAt    DateTime            @default(now()) @map("created_at")
 
   // Relations
   lot Lot? @relation(fields: [lotId], references: [id])
@@ -357,6 +395,40 @@ enum NotificationStatus {
 }
 
 // ============================================
+// EXPENSES
+// ============================================
+
+model Expense {
+  id            String          @id @default(cuid())
+  expenseNumber String          @unique @map("expense_number")
+  description   String
+  category      ExpenseCategory
+  amountCents   Int             @map("amount_cents")
+  paymentMethod PaymentMethod   @map("payment_method")
+  expenseDate   DateTime        @map("expense_date")
+  notes         String?
+  receiptUrl    String?         @map("receipt_url")
+  createdById   String          @map("created_by_id")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  createdBy User @relation("ExpenseCreatedBy", fields: [createdById], references: [id])
+
+  @@index([expenseDate])
+  @@index([category])
+  @@map("expenses")
+}
+
+enum ExpenseCategory {
+  INSUMOS
+  RENTA
+  SERVICIOS
+  EMPLEADOS
+  OTROS
+}
+
+// ============================================
 // SETTINGS
 // ============================================
 
@@ -368,4 +440,98 @@ model Settings {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("settings")
+}
+
+// ============================================
+// PERSONAL (EMPLOYEES)
+// ============================================
+
+model Employee {
+  id           String   @id @default(cuid())
+  name         String
+  phone        String?
+  email        String?
+  documentId   String?  @map("document_id")
+  position     String?
+  baseSalary   Int?     @map("base_salary")
+  startDate    DateTime? @map("start_date")
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  notes    EmployeeNote[]
+  payments EmployeePayment[]
+
+  @@map("employees")
+}
+
+model EmployeeNote {
+  id          String   @id @default(cuid())
+  employeeId  String   @map("employee_id")
+  content     String
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  createdBy User     @relation("EmployeeNoteCreatedBy", fields: [createdById], references: [id])
+
+  @@index([employeeId])
+  @@map("employee_notes")
+}
+
+model EmployeePayment {
+  id            String              @id @default(cuid())
+  employeeId    String              @map("employee_id")
+  type          EmployeePaymentType
+  amountCents   Int                 @map("amount_cents")
+  paymentDate   DateTime            @map("payment_date")
+  paymentMethod PaymentMethod       @map("payment_method")
+  description   String?
+  createdById   String              @map("created_by_id")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  createdBy User     @relation("EmployeePaymentCreatedBy", fields: [createdById], references: [id])
+
+  @@index([employeeId])
+  @@index([employeeId, paymentDate])
+  @@map("employee_payments")
+}
+
+enum EmployeePaymentType {
+  SALARY
+  BONUS
+  ADVANCE
+  OTHER
+}
+
+// ============================================
+// LANDING PAGE CONFIGURATION
+// ============================================
+
+model LandingPageConfig {
+  id                    String   @id @default(cuid())
+  heroTitle             String   @default("Pulpa 100% Fruta") @map("hero_title")
+  heroSubtitle          String   @default("¿Qué esperas para probarla?") @map("hero_subtitle")
+  heroImageUrl          String?  @map("hero_image_url")
+  heroButtonText        String   @default("Conoce más") @map("hero_button_text")
+  whatsappUrl           String   @default("https://wa.link/jg7c80") @map("whatsapp_url")
+  contactTitle          String   @default("Contáctanos") @map("contact_title")
+  contactDescription    String?  @map("contact_description")
+  contactEmail          String?  @map("contact_email")
+  contactPhone          String?  @map("contact_phone")
+  contactAddress        String?  @map("contact_address")
+  workWithUsTitle       String   @default("Trabaja con Nosotros") @map("work_with_us_title")
+  workWithUsDescription String?  @map("work_with_us_description")
+  workWithUsEmail       String?  @map("work_with_us_email")
+  isActive              Boolean  @default(true) @map("is_active")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("landing_page_config")
 }

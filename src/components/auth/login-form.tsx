@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 
 export function LoginForm() {
   const router = useRouter();
@@ -43,13 +43,7 @@ export function LoginForm() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Iniciar Sesión</CardTitle>
-        <CardDescription>
-          Ingresa tus credenciales para acceder al sistema
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <Alert variant="destructive">
@@ -62,7 +56,6 @@ export function LoginForm() {
             <Input
               id="email"
               type="email"
-              placeholder="admin@pulpas.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -75,7 +68,6 @@ export function LoginForm() {
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -86,11 +78,6 @@ export function LoginForm() {
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </Button>
-
-          <div className="mt-4 text-center text-sm text-gray-600">
-            <p>Usuario de prueba:</p>
-            <p className="font-mono text-xs">admin@pulpas.com / admin123</p>
-          </div>
         </form>
       </CardContent>
     </Card>
