@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
+import { Upload, X, Image as ImageIcon } from 'lucide-react';
 
 interface LandingConfig {
   heroTitle: string;
@@ -43,8 +44,10 @@ const DEFAULT_CONFIG: LandingConfig = {
 export function LandingSettingsForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [config, setConfig] = useState<LandingConfig>(DEFAULT_CONFIG);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadConfig();
@@ -76,6 +79,56 @@ export function LandingSettingsForm() {
       console.error('Error loading landing config:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      setMessage({ type: 'error', text: 'Tipo de archivo no permitido. Solo se permiten JPEG, PNG, WebP y GIF.' });
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setMessage({ type: 'error', text: 'El archivo es muy grande. El tamaño máximo es 5MB.' });
+      return;
+    }
+
+    setIsUploading(true);
+    setMessage(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (config.heroImageUrl) {
+        formData.append('oldUrl', config.heroImageUrl);
+      }
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Error al subir la imagen');
+      }
+
+      const data = await response.json();
+      setConfig({ ...config, heroImageUrl: data.url });
+      setMessage({ type: 'success', text: 'Imagen subida exitosamente' });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Error al subir la imagen' });
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -144,18 +197,62 @@ export function LandingSettingsForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="heroImageUrl">URL de la Imagen Principal</Label>
-            <Input
-              id="heroImageUrl"
-              type="url"
-              value={config.heroImageUrl}
-              onChange={(e) => setConfig({ ...config, heroImageUrl: e.target.value })}
-              placeholder="https://ejemplo.com/imagen.jpg"
-            />
-            <p className="text-xs text-gray-500">
-              Puedes usar imágenes de Unsplash, Pexels u otro servicio de imágenes. 
-              Recomendado: imagen de alta resolución (1920x1080 o superior)
-            </p>
+            <Label>Imagen Principal</Label>
+            <div className="space-y-3">
+              {config.heroImageUrl && (
+                <div className="relative w-full max-w-md">
+                  <img
+                    src={config.heroImageUrl}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-lg border"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-8 w-8"
+                    onClick={() => setConfig({ ...config, heroImageUrl: '' })}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <div className="flex items-center gap-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="heroImageUpload"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <>Subiendo...</>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      {config.heroImageUrl ? 'Cambiar Imagen' : 'Subir Imagen'}
+                    </>
+                  )}
+                </Button>
+                {!config.heroImageUrl && (
+                  <span className="text-sm text-gray-500 flex items-center gap-1">
+                    <ImageIcon className="h-4 w-4" />
+                    Sin imagen seleccionada
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-500">
+                Formatos permitidos: JPEG, PNG, WebP, GIF. Tamaño máximo: 5MB.
+                Recomendado: imagen de alta resolución (1920x1080 o superior)
+              </p>
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="heroButtonText">Texto del Botón</Label>
