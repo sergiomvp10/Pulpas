@@ -63,8 +63,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const expenseCount = await prisma.expense.count();
-    const expenseNumber = `G-${String(expenseCount + 1).padStart(6, '0')}`;
+    // Find the maximum expense number sequence by scanning existing expenses
+    // This handles cases where some expense numbers don't match the G-###### pattern
+    const existingExpenses = await prisma.expense.findMany({
+      select: { expenseNumber: true },
+    });
+
+    let maxSequence = 0;
+    for (const expense of existingExpenses) {
+      const match = expense.expenseNumber?.match(/^G-(\d+)$/);
+      if (match) {
+        const seq = parseInt(match[1], 10);
+        if (seq > maxSequence) {
+          maxSequence = seq;
+        }
+      }
+    }
+
+    const nextSequence = maxSequence + 1;
+    const expenseNumber = `G-${String(nextSequence).padStart(6, '0')}`;
 
     const expense = await prisma.expense.create({
       data: {
