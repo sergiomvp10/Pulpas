@@ -439,3 +439,29 @@ model Settings {
 
   @@map("settings")
 }
+
+// ============================================
+// LANDING PAGE CONFIGURATION
+// ============================================
+
+model LandingPageConfig {
+  id                    String   @id @default(cuid())
+  heroTitle             String   @default("Pulpa 100% Fruta") @map("hero_title")
+  heroSubtitle          String   @default("¿Qué esperas para probarla?") @map("hero_subtitle")
+  heroImageUrl          String?  @map("hero_image_url")
+  heroButtonText        String   @default("Conoce más") @map("hero_button_text")
+  whatsappUrl           String   @default("https://wa.link/jg7c80") @map("whatsapp_url")
+  contactTitle          String   @default("Contáctanos") @map("contact_title")
+  contactDescription    String?  @map("contact_description")
+  contactEmail          String?  @map("contact_email")
+  contactPhone          String?  @map("contact_phone")
+  contactAddress        String?  @map("contact_address")
+  workWithUsTitle       String   @default("Trabaja con Nosotros") @map("work_with_us_title")
+  workWithUsDescription String?  @map("work_with_us_description")
+  workWithUsEmail       String?  @map("work_with_us_email")
+  isActive              Boolean  @default(true) @map("is_active")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("landing_page_config")
+}

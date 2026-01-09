@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SettingsForm } from '@/components/settings/settings-form';
 import { ClearDataButton } from '@/components/settings/clear-data-button';
 import { UserManagement } from '@/components/settings/user-management';
+import { LandingSettingsForm } from '@/components/settings/landing-settings-form';
 
 export const metadata = {
   title: 'Configuración | FrutyLab',
@@ -17,6 +18,18 @@ export default function SettingsPage() {
       </div>
 
       <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Configuración del Landing Page</CardTitle>
+            <CardDescription>
+              Personaliza el contenido de la página principal pública (hero, contacto, trabaja con nosotros)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LandingSettingsForm />
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Configuración del Negocio</CardTitle>
