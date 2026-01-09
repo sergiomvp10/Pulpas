@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BillingClient } from '@/components/billing/billing-client';
 
 export const metadata = {
   title: 'Facturación | FrutyLab',
@@ -11,20 +11,11 @@ export default function BillingPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Facturación</h1>
         <p className="text-gray-500">
-          Gestión de facturas y documentos tributarios
+          Selecciona una venta para generar y descargar la factura
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Facturas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500">
-            Esta sección estará disponible próximamente para generar facturas, notas de crédito y gestionar documentos tributarios.
-          </p>
-        </CardContent>
-      </Card>
+      <BillingClient />
     </div>
   );
 }
