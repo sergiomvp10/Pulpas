@@ -13,9 +13,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { FileText, Download, Eye, Loader2 } from 'lucide-react';
+import { FileText, Download, Eye, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
 import { InvoicePDF } from './invoice-pdf';
+import { EditSaleModal } from './edit-sale-modal';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface SaleLine {
   id: string;
@@ -23,6 +34,7 @@ interface SaleLine {
   unitPriceCents: number;
   subtotalCents: number;
   productVariant: {
+    id: string;
     gramWeightG: number;
     sku: string;
     productBase: {
@@ -42,12 +54,14 @@ interface Sale {
   totalAmountCents: number;
   currency: string;
   customer: {
+    id: string;
     name: string;
     phone: string;
     email?: string;
     city?: string;
   } | null;
   seller: {
+    id: string;
     name: string;
     phone: string;
     email: string;
@@ -103,6 +117,9 @@ export function BillingClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchSales();
@@ -144,6 +161,36 @@ export function BillingClient() {
     }
   };
 
+  const handleDeleteSale = async () => {
+    if (!selectedSale) return;
+
+    try {
+      setIsDeleting(true);
+      const response = await fetch(`/api/sales/${selectedSale.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Error al eliminar la venta');
+      }
+
+      setIsDeleteDialogOpen(false);
+      setSelectedSale(null);
+      fetchSales();
+    } catch (err) {
+      console.error('Error deleting sale:', err);
+      alert(err instanceof Error ? err.message : 'Error al eliminar la venta');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleSaleUpdated = () => {
+    fetchSales();
+    setSelectedSale(null);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -172,7 +219,7 @@ export function BillingClient() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Últimas 15 Ventas
+            Ventas del Último Mes
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -244,6 +291,28 @@ export function BillingClient() {
                     {formatDate(selectedSale.occurredAt)}
                   </p>
                 </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditModalOpen(true)}
+                  >
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Editar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Eliminar
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
                 <Button
                   onClick={() => handleDownloadPDF(selectedSale)}
                   disabled={isDownloading}
@@ -343,6 +412,42 @@ export function BillingClient() {
           )}
         </CardContent>
       </Card>
+
+      <EditSaleModal
+        sale={selectedSale}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSaved={handleSaleUpdated}
+      />
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar Factura</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que deseas eliminar la factura {selectedSale?.saleNumber}?
+              Esta acción devolverá los productos al inventario y no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteSale}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                'Eliminar'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
