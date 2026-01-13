@@ -9,9 +9,16 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Get sales from the last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
     const recentSales = await prisma.sale.findMany({
       where: {
         status: 'COMPLETED',
+        occurredAt: {
+          gte: thirtyDaysAgo,
+        },
       },
       include: {
         customer: true,
@@ -46,7 +53,6 @@ export async function GET() {
       orderBy: {
         occurredAt: 'desc',
       },
-      take: 15,
     });
 
     return NextResponse.json(recentSales);
