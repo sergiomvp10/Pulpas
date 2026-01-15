@@ -1,9 +1,65 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+
+function useScrollAnimation(threshold = 0.1) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold }
+    );
+
+    const currentRef = ref.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [threshold]);
+
+  return { ref, isVisible };
+}
+
+function AnimatedSection({ 
+  children, 
+  className = '', 
+  delay = 0 
+}: { 
+  children: React.ReactNode; 
+  className?: string; 
+  delay?: number;
+}) {
+  const { ref, isVisible } = useScrollAnimation(0.1);
+
+  return (
+    <div
+      ref={ref}
+      className={`transform transition-all duration-700 ease-out ${
+        isVisible 
+          ? 'translate-x-0 opacity-100' 
+          : 'translate-x-20 opacity-0'
+      } ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
 
 interface LandingConfig {
   id: string;
@@ -148,122 +204,134 @@ export function LandingPage({ config }: LandingPageProps) {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <AnimatedSection className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">
               ¿Por qué elegir <span className="text-green-600">FrutyLab</span>?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Ofrecemos pulpa de fruta 100% natural, sin conservantes ni aditivos
             </p>
-          </div>
+          </AnimatedSection>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center p-6 hover:shadow-lg transition-shadow border-t-4 border-t-green-500">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">100% Natural</h3>
-                <p className="text-gray-600">Sin conservantes, sin colorantes, solo fruta fresca</p>
-              </CardContent>
-            </Card>
+            <AnimatedSection delay={0}>
+              <Card className="text-center p-6 hover:shadow-lg transition-shadow border-t-4 border-t-green-500 h-full">
+                <CardContent className="pt-6">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">100% Natural</h3>
+                  <p className="text-gray-600">Sin conservantes, sin colorantes, solo fruta fresca</p>
+                </CardContent>
+              </Card>
+            </AnimatedSection>
             
-            <Card className="text-center p-6 hover:shadow-lg transition-shadow border-t-4 border-t-orange-500">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Frescura Garantizada</h3>
-                <p className="text-gray-600">Procesamos la fruta en su punto óptimo de maduración</p>
-              </CardContent>
-            </Card>
+            <AnimatedSection delay={150}>
+              <Card className="text-center p-6 hover:shadow-lg transition-shadow border-t-4 border-t-orange-500 h-full">
+                <CardContent className="pt-6">
+                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Frescura Garantizada</h3>
+                  <p className="text-gray-600">Procesamos la fruta en su punto óptimo de maduración</p>
+                </CardContent>
+              </Card>
+            </AnimatedSection>
             
-            <Card className="text-center p-6 hover:shadow-lg transition-shadow border-t-4 border-t-green-500">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Vida Saludable</h3>
-                <p className="text-gray-600">Ideal para deportistas y amantes de lo natural</p>
-              </CardContent>
-            </Card>
+            <AnimatedSection delay={300}>
+              <Card className="text-center p-6 hover:shadow-lg transition-shadow border-t-4 border-t-green-500 h-full">
+                <CardContent className="pt-6">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Vida Saludable</h3>
+                  <p className="text-gray-600">Ideal para deportistas y amantes de lo natural</p>
+                </CardContent>
+              </Card>
+            </AnimatedSection>
           </div>
         </div>
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 bg-gradient-to-b from-green-50 to-white">
+      <section id="contact" className="py-20 bg-gradient-to-b from-green-50 to-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <AnimatedSection className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-800 mb-4">{config.contactTitle}</h2>
             {config.contactDescription && (
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">{config.contactDescription}</p>
             )}
-          </div>
+          </AnimatedSection>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {config.contactEmail && (
-              <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold text-gray-800 mb-2">Email</h3>
-                  <a href={`mailto:${config.contactEmail}`} className="text-green-600 hover:underline">
-                    {config.contactEmail}
-                  </a>
-                </CardContent>
-              </Card>
+              <AnimatedSection delay={0}>
+                <Card className="text-center p-6 hover:shadow-lg transition-shadow h-full">
+                  <CardContent className="pt-6">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-gray-800 mb-2">Email</h3>
+                    <a href={`mailto:${config.contactEmail}`} className="text-green-600 hover:underline">
+                      {config.contactEmail}
+                    </a>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             )}
             
             {config.contactPhone && (
-              <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold text-gray-800 mb-2">Teléfono</h3>
-                  <a href={`tel:${config.contactPhone}`} className="text-green-600 hover:underline">
-                    {config.contactPhone}
-                  </a>
-                </CardContent>
-              </Card>
+              <AnimatedSection delay={150}>
+                <Card className="text-center p-6 hover:shadow-lg transition-shadow h-full">
+                  <CardContent className="pt-6">
+                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-gray-800 mb-2">Teléfono</h3>
+                    <a href={`tel:${config.contactPhone}`} className="text-green-600 hover:underline">
+                      {config.contactPhone}
+                    </a>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             )}
             
             {config.contactAddress && (
-              <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold text-gray-800 mb-2">Dirección</h3>
-                  <p className="text-gray-600">{config.contactAddress}</p>
-                </CardContent>
-              </Card>
+              <AnimatedSection delay={300}>
+                <Card className="text-center p-6 hover:shadow-lg transition-shadow h-full">
+                  <CardContent className="pt-6">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-gray-800 mb-2">Dirección</h3>
+                    <p className="text-gray-600">{config.contactAddress}</p>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             )}
           </div>
         </div>
       </section>
 
       {/* Work With Us Section */}
-      <section id="work-with-us" className="py-20 bg-gradient-to-r from-green-600 to-green-700 text-white">
+      <section id="work-with-us" className="py-20 bg-gradient-to-r from-green-600 to-green-700 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto">
+          <AnimatedSection className="text-center max-w-3xl mx-auto">
             <h2 className="text-4xl font-bold mb-6">{config.workWithUsTitle}</h2>
             {config.workWithUsDescription && (
               <p className="text-xl text-green-100 mb-8">{config.workWithUsDescription}</p>
@@ -284,7 +352,7 @@ export function LandingPage({ config }: LandingPageProps) {
                 </Button>
               </a>
             )}
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
