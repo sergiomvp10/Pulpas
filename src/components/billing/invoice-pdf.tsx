@@ -1,6 +1,6 @@
 'use client';
 
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
   page: {
@@ -22,6 +22,12 @@ const styles = StyleSheet.create({
   companySlogan: {
     fontSize: 10,
     color: '#666',
+  },
+  companyLogo: {
+    width: 120,
+    height: 50,
+    objectFit: 'contain',
+    marginBottom: 5,
   },
   invoiceTitle: {
     fontSize: 18,
@@ -186,6 +192,8 @@ interface Sale {
 
 interface InvoicePDFProps {
   sale: Sale;
+  logoUrl?: string;
+  businessName?: string;
 }
 
 function formatCurrency(cents: number): string {
@@ -217,14 +225,18 @@ function getPaymentMethodLabel(method: string): string {
   return methods[method] || method;
 }
 
-export function InvoicePDF({ sale }: InvoicePDFProps) {
+export function InvoicePDF({ sale, logoUrl, businessName = 'FrutyLab' }: InvoicePDFProps) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <View style={styles.headerRow}>
             <View>
-              <Text style={styles.companyName}>FrutyLab</Text>
+              {logoUrl ? (
+                <Image src={logoUrl} style={styles.companyLogo} alt="Logo" />
+              ) : (
+                <Text style={styles.companyName}>{businessName}</Text>
+              )}
               <Text style={styles.companySlogan}>Pulpa 100% Fruta</Text>
             </View>
             <View>
@@ -323,8 +335,7 @@ export function InvoicePDF({ sale }: InvoicePDFProps) {
         </View>
 
         <View style={styles.footer}>
-          <Text>Gracias por su compra - FrutyLab</Text>
-          <Text>www.frutylab.com</Text>
+          <Text>Gracias por su compra - {businessName}</Text>
         </View>
       </Page>
     </Document>

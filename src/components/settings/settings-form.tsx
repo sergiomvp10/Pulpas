@@ -22,6 +22,7 @@ interface Settings {
   businessPhone: string;
   businessEmail: string;
   businessAddress: string;
+  invoiceLogoUrl: string;
 }
 
 export function SettingsForm() {
@@ -40,6 +41,7 @@ export function SettingsForm() {
     businessPhone: '',
     businessEmail: '',
     businessAddress: '',
+    invoiceLogoUrl: '',
   });
 
   useEffect(() => {
@@ -269,6 +271,44 @@ export function SettingsForm() {
               onChange={(e) => setSettings({ ...settings, businessAddress: e.target.value })}
             />
           </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Logo de Factura */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Logo de Factura</h3>
+          <p className="text-sm text-gray-500">URL de la imagen del logo que aparecerá en las facturas generadas</p>
+        </div>
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="invoiceLogoUrl">URL del Logo</Label>
+            <Input
+              id="invoiceLogoUrl"
+              type="url"
+              placeholder="https://ejemplo.com/logo.png"
+              value={settings.invoiceLogoUrl}
+              onChange={(e) => setSettings({ ...settings, invoiceLogoUrl: e.target.value })}
+            />
+            <p className="text-xs text-gray-400">Ingresa la URL de una imagen (PNG, JPG). Si está vacío, se mostrará el nombre del negocio como texto.</p>
+          </div>
+          {settings.invoiceLogoUrl && (
+            <div className="space-y-2">
+              <Label>Vista previa del logo</Label>
+              <div className="border rounded-lg p-4 bg-gray-50 flex items-center justify-center">
+                <img 
+                  src={settings.invoiceLogoUrl} 
+                  alt="Logo preview" 
+                  className="max-h-24 max-w-48 object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
