@@ -192,7 +192,7 @@ interface Sale {
 
 interface InvoicePDFProps {
   sale: Sale;
-  logoUrl?: string;
+  logoBase64?: string;
   businessName?: string;
 }
 
@@ -225,15 +225,15 @@ function getPaymentMethodLabel(method: string): string {
   return methods[method] || method;
 }
 
-export function InvoicePDF({ sale, logoUrl, businessName = 'FrutyLab' }: InvoicePDFProps) {
+export function InvoicePDF({ sale, logoBase64, businessName = 'FrutyLab' }: InvoicePDFProps) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <View style={styles.headerRow}>
             <View>
-              {logoUrl ? (
-                <Image src={logoUrl} style={styles.companyLogo} alt="Logo" />
+              {logoBase64 ? (
+                <Image src={logoBase64} style={styles.companyLogo} />
               ) : (
                 <Text style={styles.companyName}>{businessName}</Text>
               )}
@@ -336,6 +336,7 @@ export function InvoicePDF({ sale, logoUrl, businessName = 'FrutyLab' }: Invoice
 
         <View style={styles.footer}>
           <Text>Gracias por su compra - {businessName}</Text>
+          <Text>www.frutylab.com</Text>
         </View>
       </Page>
     </Document>

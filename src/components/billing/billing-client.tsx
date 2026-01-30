@@ -112,10 +112,9 @@ function getPaymentMethodColor(method: string): string {
 }
 
 interface InvoiceSettings {
-  invoiceLogoUrl: string;
+  invoiceLogoBase64: string;
   businessName: string;
 }
-
 export function BillingClient() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
@@ -126,7 +125,7 @@ export function BillingClient() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [invoiceSettings, setInvoiceSettings] = useState<InvoiceSettings>({
-    invoiceLogoUrl: '',
+    invoiceLogoBase64: '',
     businessName: 'FrutyLab',
   });
 
@@ -141,7 +140,7 @@ export function BillingClient() {
       if (response.ok) {
         const data = await response.json();
         setInvoiceSettings({
-          invoiceLogoUrl: data.invoiceLogoUrl || '',
+          invoiceLogoBase64: data.invoiceLogoBase64 || '',
           businessName: data.businessName || 'FrutyLab',
         });
       }
@@ -172,7 +171,7 @@ export function BillingClient() {
       const blob = await pdf(
         <InvoicePDF 
           sale={sale} 
-          logoUrl={invoiceSettings.invoiceLogoUrl || undefined}
+          logoBase64={invoiceSettings.invoiceLogoBase64 || undefined}
           businessName={invoiceSettings.businessName}
         />
       ).toBlob();

@@ -2,8 +2,10 @@ import { Suspense } from 'react';
 import { prisma } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { CustomerActions } from '@/components/customers/customer-actions';
+import { auth } from '@/auth';
 
 export const metadata = {
   title: 'Clientes | FrutyLab',
@@ -11,9 +13,33 @@ export const metadata = {
 };
 
 async function CustomersList() {
+  const session = await auth();
+  const user = session?.user as { id: string; role: string } | undefined;
+  const isAdmin = user?.role === 'ADMIN';
+  const isSeller = user?.role === 'SELLER';
+
+  const whereClause: { active: boolean; createdBySellerId?: string } = { active: true };
+
+  if (isSeller && user?.id) {
+    const seller = await prisma.seller.findUnique({
+      where: { userId: user.id },
+    });
+    if (seller) {
+      whereClause.createdBySellerId = seller.id;
+    }
+  }
+
   const customers = await prisma.customer.findMany({
-    where: { active: true },
+    where: whereClause,
     orderBy: { name: 'asc' },
+    include: {
+      createdBySeller: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
   });
 
   if (customers.length === 0) {
@@ -36,8 +62,15 @@ async function CustomersList() {
             <div className="flex items-start justify-between">
               <div>
                 <CardTitle className="text-lg">{customer.name}</CardTitle>
+                {isAdmin && customer.createdBySeller && (
+                  <Badge variant="outline" className="mt-1 text-xs">
+                    Vendedor: {customer.createdBySeller.name}
+                  </Badge>
+                )}
               </div>
-              <CustomerActions customerId={customer.id} customerName={customer.name} />
+              {isAdmin && (
+                <CustomerActions customerId={customer.id} customerName={customer.name} />
+              )}
             </div>
           </CardHeader>
           <CardContent>
