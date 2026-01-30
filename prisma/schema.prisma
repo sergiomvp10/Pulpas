@@ -53,18 +53,20 @@ enum UserRole {
 // ============================================
 
 model Customer {
-  id        String   @id @default(cuid())
-  name      String
-  phone     String
-  email     String?
-  city      String?
-  notes     String?
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(cuid())
+  name              String
+  phone             String
+  email             String?
+  city              String?
+  notes             String?
+  active            Boolean  @default(true)
+  createdBySellerId String?  @map("created_by_seller_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   // Relations
-  sales Sale[]
+  sales           Sale[]
+  createdBySeller Seller? @relation("CustomerCreatedBySeller", fields: [createdBySellerId], references: [id])
 
   @@map("customers")
 }
@@ -86,10 +88,38 @@ model Seller {
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user  User?  @relation("SellerUser", fields: [userId], references: [id])
-  sales Sale[] @relation("SellerSales")
+  user              User?        @relation("SellerUser", fields: [userId], references: [id])
+  sales             Sale[]       @relation("SellerSales")
+  customersCreated  Customer[]   @relation("CustomerCreatedBySeller")
+  goals             SellerGoal[] @relation("SellerGoals")
 
   @@map("sellers")
+}
+
+model SellerGoal {
+  id          String   @id @default(cuid())
+  sellerId    String   @map("seller_id")
+  title       String
+  targetValue Int      @map("target_value")
+  currentValue Int     @default(0) @map("current_value")
+  goalType    GoalType @default(SALES_COUNT) @map("goal_type")
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+  isCompleted Boolean  @default(false) @map("is_completed")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  seller Seller @relation("SellerGoals", fields: [sellerId], references: [id])
+
+  @@index([sellerId])
+  @@map("seller_goals")
+}
+
+enum GoalType {
+  SALES_COUNT
+  SALES_AMOUNT
+  NEW_CUSTOMERS
 }
 
 // ============================================

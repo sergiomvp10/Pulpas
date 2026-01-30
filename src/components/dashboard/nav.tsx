@@ -28,9 +28,10 @@ interface DashboardNavProps {
 const allNavItems = [
   { href: '/dashboard', label: 'Dashboard', roles: ['ADMIN', 'SELLER'] },
   { href: '/dashboard/products', label: 'Productos', roles: ['ADMIN'] },
-  { href: '/dashboard/inventory', label: 'Inventario', roles: ['ADMIN', 'PRODUCCION'] },
+  { href: '/dashboard/inventory', label: 'Inventario', roles: ['ADMIN', 'PRODUCCION', 'SELLER'] },
   { href: '/dashboard/sales', label: 'Ventas', roles: ['ADMIN', 'SELLER'] },
   { href: '/dashboard/customers', label: 'Clientes', roles: ['ADMIN', 'SELLER'] },
+  { href: '/dashboard/my-progress', label: 'Mi Progreso', roles: ['SELLER'] },
   { href: '/dashboard/sellers', label: 'Vendedores', roles: ['ADMIN'] },
   { href: '/dashboard/personal', label: 'Personal', roles: ['ADMIN'] },
   { href: '/dashboard/expenses', label: 'Gastos', roles: ['ADMIN'] },
