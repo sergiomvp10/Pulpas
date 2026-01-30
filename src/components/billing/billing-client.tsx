@@ -115,7 +115,6 @@ interface InvoiceSettings {
   invoiceLogoBase64: string;
   businessName: string;
 }
-
 export function BillingClient() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);

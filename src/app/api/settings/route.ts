@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
       businessPhone: settings.businessPhone || '',
       businessEmail: settings.businessEmail || '',
       businessAddress: settings.businessAddress || '',
+      invoiceLogoUrl: settings.invoiceLogoUrl || '',
     });
   } catch (error) {
     console.error('Error fetching settings:', error);
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
       { key: 'businessPhone', value: body.businessPhone },
       { key: 'businessEmail', value: body.businessEmail },
       { key: 'businessAddress', value: body.businessAddress },
+      { key: 'invoiceLogoUrl', value: body.invoiceLogoUrl || '' },
     ];
 
     for (const setting of settingsToSave) {
