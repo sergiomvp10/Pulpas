@@ -9,17 +9,34 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userRole = session.user.role;
+    const userId = session.user.id;
+
     // Get sales from the last 30 days
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const recentSales = await prisma.sale.findMany({
-      where: {
-        status: 'COMPLETED',
-        occurredAt: {
-          gte: thirtyDaysAgo,
-        },
+    // Build where clause - filter by seller for SELLER role
+    let whereClause: any = {
+      status: 'COMPLETED',
+      occurredAt: {
+        gte: thirtyDaysAgo,
       },
+    };
+
+    // If user is a SELLER, only show their own sales
+    if (userRole === 'SELLER') {
+      const seller = await prisma.seller.findUnique({
+        where: { userId },
+      });
+      
+      if (seller) {
+        whereClause.sellerId = seller.id;
+      }
+    }
+
+    const recentSales = await prisma.sale.findMany({
+      where: whereClause,
       include: {
         customer: true,
         seller: {
