@@ -105,7 +105,7 @@ export function NewSaleForm({ productVariants, customers, sellers, userRole }: N
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerId: customerId || null,
+          customerId: customerId && customerId !== 'none' ? customerId : null,
           sellerId: sellerId || null,
           paymentMethod,
           lines: saleLines.map(line => ({
@@ -152,11 +152,14 @@ export function NewSaleForm({ productVariants, customers, sellers, userRole }: N
               <SelectValue placeholder="Selecciona un cliente" />
             </SelectTrigger>
             <SelectContent>
-              {customers.map((customer: any) => (
-                <SelectItem key={customer.id} value={customer.id}>
-                  {customer.name}
-                </SelectItem>
-              ))}
+              <SelectItem value="none">Sin cliente</SelectItem>
+              {customers
+                .filter((customer) => customer.id && customer.name)
+                .map((customer) => (
+                  <SelectItem key={customer.id} value={customer.id}>
+                    {customer.name}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
