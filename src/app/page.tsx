@@ -5,7 +5,7 @@ const DEFAULT_CONFIG = {
   id: 'default',
   heroTitle: 'Pulpa 100% Fruta',
   heroSubtitle: '¿Qué esperas para probarla?',
-  heroImageUrl: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=1200&q=80',
+  heroImageUrl: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=1920&q=90',
   heroButtonText: 'Conoce más',
   whatsappUrl: 'https://wa.link/jg7c80',
   contactTitle: 'Contáctanos',
