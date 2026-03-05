@@ -103,7 +103,13 @@ function WhatsAppButton({ url }: { url: string }) {
   );
 }
 
+const FALLBACK_HERO_IMAGE = 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=1920&q=90';
+
 export function LandingPage({ config }: LandingPageProps) {
+  const heroImage = config.heroImageUrl && config.heroImageUrl.trim() !== '' 
+    ? config.heroImageUrl 
+    : FALLBACK_HERO_IMAGE;
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -159,13 +165,15 @@ export function LandingPage({ config }: LandingPageProps) {
       {/* Hero Section */}
       <section id="hero" className="relative min-h-screen flex items-center pt-16">
         <div className="absolute inset-0 z-0">
-          {config.heroImageUrl && (
-            <img
-              src={config.heroImageUrl}
-              alt="Hero background"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          )}
+          <Image
+            src={heroImage}
+            alt="Hero background"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+            quality={90}
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-green-900/30" />
         </div>
         
