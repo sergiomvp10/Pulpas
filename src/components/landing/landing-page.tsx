@@ -146,6 +146,8 @@ interface LandingPageProps {
   config: LandingConfig;
 }
 
+const FALLBACK_HERO_IMAGE = 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=1920&q=90';
+
 function WhatsAppButton({ url }: { url: string }) {
   return (
     <a
@@ -170,6 +172,10 @@ function WhatsAppButton({ url }: { url: string }) {
 export function LandingPage({ config }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  
+  const heroImage = config.heroImageUrl && config.heroImageUrl.trim() !== '' 
+    ? config.heroImageUrl 
+    : FALLBACK_HERO_IMAGE;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -279,17 +285,15 @@ export function LandingPage({ config }: LandingPageProps) {
       {/* Hero Section */}
       <section id="hero" className="relative min-h-screen flex items-center">
         <div className="absolute inset-0 z-0">
-          {config.heroImageUrl && (
-            <Image
-              src={config.heroImageUrl}
-              alt="Hero background"
-              fill
-              className="object-cover"
-              priority
-              sizes="100vw"
-              quality={85}
-            />
-          )}
+          <Image
+            src={heroImage}
+            alt="Hero background"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+            quality={90}
+          />
           <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-green-900/40" />
         </div>
         
