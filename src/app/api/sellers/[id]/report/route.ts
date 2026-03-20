@@ -7,15 +7,9 @@ import { toZonedTime } from 'date-fns-tz';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -24,7 +18,8 @@ export async function GET(
     }
 
     const url = request.nextUrl;
-    const fromParams = params?.id;
+    const resolvedParams = await params;
+    const fromParams = resolvedParams?.id;
     const fromQuery = url.searchParams.get('sellerId') ?? undefined;
     const fromPath = url.pathname.match(/\/api\/sellers\/([^/]+)\/report/i)?.[1];
     const sellerId = fromParams ?? fromQuery ?? fromPath;

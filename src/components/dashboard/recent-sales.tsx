@@ -21,7 +21,7 @@ export async function RecentSales() {
     },
   };
 
-  if (userRole === 'SELLER') {
+  if (userRole === 'SELLER' && userId) {
     const seller = await prisma.seller.findUnique({
       where: { userId },
     });

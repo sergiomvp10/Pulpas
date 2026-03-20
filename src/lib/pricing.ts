@@ -1,4 +1,4 @@
-import { ProductVariant, Category, Lot } from '@prisma/client';
+import type { ProductVariant, Category, Lot } from '@prisma/client';
 
 type ProductVariantWithCategory = ProductVariant & {
   productBase: {
