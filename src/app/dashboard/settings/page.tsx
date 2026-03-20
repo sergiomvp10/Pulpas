@@ -1,6 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SettingsForm } from '@/components/settings/settings-form';
 import { ClearDataButton } from '@/components/settings/clear-data-button';
+import { ResetInventoryButton } from '@/components/settings/reset-inventory-button';
+import { ChangePasswordForm } from '@/components/settings/change-password-form';
 import { UserManagement } from '@/components/settings/user-management';
 import { LandingSettingsForm } from '@/components/settings/landing-settings-form';
 
@@ -51,6 +53,30 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <UserManagement />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Cambiar Contraseña</CardTitle>
+            <CardDescription>
+              Cambia la contraseña de tu cuenta de administrador.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChangePasswordForm />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Restablecer Inventario</CardTitle>
+            <CardDescription>
+              Elimina todo el inventario (lotes) para hacer un nuevo conteo. No afecta productos, ventas, clientes ni vendedores.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResetInventoryButton />
           </CardContent>
         </Card>
 

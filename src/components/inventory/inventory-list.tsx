@@ -44,10 +44,16 @@ interface AggregatedInventory {
   lotCount: number;
 }
 
-export function InventoryList() {
+interface InventoryListProps {
+  userRole: string;
+}
+
+export function InventoryList({ userRole }: InventoryListProps) {
   const [lots, setLots] = useState<Lot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  
+  const isSeller = userRole === 'SELLER';
 
   const fetchLots = async () => {
     try {
@@ -115,9 +121,11 @@ export function InventoryList() {
           <h1 className="text-3xl font-bold tracking-tight">Inventario</h1>
           <p className="text-gray-500">Stock disponible por producto</p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/inventory/new">Añadir Producción</Link>
-        </Button>
+        {!isSeller && (
+          <Button asChild>
+            <Link href="/dashboard/inventory/new">Añadir Producción</Link>
+          </Button>
+        )}
       </div>
 
       {error && (
@@ -155,15 +163,26 @@ export function InventoryList() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-4 md:grid-cols-3">
+                  <div className={`grid gap-4 ${isSeller ? 'md:grid-cols-2' : 'md:grid-cols-3'}`}>
                     <div>
-                      <p className="text-xs text-gray-500">Unidades Disponibles</p>
-                      <p className="text-2xl font-bold">{item.totalUnits}</p>
+                      <p className="text-xs text-gray-500">Disponibilidad</p>
+                      {isSeller ? (
+                        <Badge 
+                          variant={item.totalUnits < 10 ? 'destructive' : 'default'}
+                          className={`text-sm font-bold ${item.totalUnits >= 10 ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                        >
+                          {item.totalUnits < 10 ? 'POCO STOCK' : 'ALTO STOCK'}
+                        </Badge>
+                      ) : (
+                        <p className="text-2xl font-bold">{item.totalUnits}</p>
+                      )}
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Costo Promedio</p>
-                      <p className="text-lg font-bold">{formatCurrency(avgCost)}</p>
-                    </div>
+                    {!isSeller && (
+                      <div>
+                        <p className="text-xs text-gray-500">Costo Promedio</p>
+                        <p className="text-lg font-bold">{formatCurrency(avgCost)}</p>
+                      </div>
+                    )}
                     <div>
                       <p className="text-xs text-gray-500">Próximo Vencimiento</p>
                       <p className="text-sm">{item.totalUnits > 0 ? formatDateShortColombia(item.earliestExpiry) : '-'}</p>

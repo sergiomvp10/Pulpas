@@ -11,16 +11,40 @@ const createCustomerSchema = z.object({
   notes: z.string().optional(),
 });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const user = session.user as { id: string; role: string };
+    
+    const whereClause: { active: boolean; createdBySellerId?: string } = { active: true };
+    
+    if (user.role === 'SELLER') {
+      const seller = await prisma.seller.findUnique({
+        where: { userId: user.id },
+      });
+      
+      if (seller) {
+        whereClause.createdBySellerId = seller.id;
+      } else {
+        return NextResponse.json([]);
+      }
+    }
+
     const customers = await prisma.customer.findMany({
-      where: { active: true },
+      where: whereClause,
       orderBy: { name: 'asc' },
+      include: {
+        createdBySeller: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(customers);
@@ -37,14 +61,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const user = session.user as { id: string; role: string };
     const body = await request.json();
     const validatedData = createCustomerSchema.parse(body);
+
+    let createdBySellerId: string | null = null;
+    
+    if (user.role === 'SELLER') {
+      const seller = await prisma.seller.findUnique({
+        where: { userId: user.id },
+      });
+      if (seller) {
+        createdBySellerId = seller.id;
+      }
+    }
 
     const customer = await prisma.customer.create({
       data: {
         ...validatedData,
         email: validatedData.email || null,
         city: validatedData.city || null,
+        createdBySellerId,
+      },
+      include: {
+        createdBySeller: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 

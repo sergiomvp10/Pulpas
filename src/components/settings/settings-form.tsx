@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
+import { Upload, X } from 'lucide-react';
 
 interface Settings {
   pricePerGramTradicional: number;
@@ -22,6 +23,7 @@ interface Settings {
   businessPhone: string;
   businessEmail: string;
   businessAddress: string;
+  invoiceLogoBase64: string;
 }
 
 export function SettingsForm() {
@@ -40,7 +42,38 @@ export function SettingsForm() {
     businessPhone: '',
     businessEmail: '',
     businessAddress: '',
+    invoiceLogoBase64: '',
   });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setMessage({ type: 'error', text: 'Por favor selecciona un archivo de imagen válido' });
+      return;
+    }
+
+    if (file.size > 500 * 1024) {
+      setMessage({ type: 'error', text: 'La imagen debe ser menor a 500KB' });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setSettings({ ...settings, invoiceLogoBase64: base64 });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeLogo = () => {
+    setSettings({ ...settings, invoiceLogoBase64: '' });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   useEffect(() => {
     loadSettings();
@@ -269,6 +302,62 @@ export function SettingsForm() {
               onChange={(e) => setSettings({ ...settings, businessAddress: e.target.value })}
             />
           </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-medium">Logo de Factura</h3>
+          <p className="text-sm text-gray-500">Sube una imagen para mostrar en las facturas generadas</p>
+        </div>
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <Label>Imagen del Logo</Label>
+            <div className="flex items-center gap-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="hidden"
+                id="logo-upload"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Seleccionar Imagen
+              </Button>
+              {settings.invoiceLogoBase64 && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={removeLogo}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Eliminar
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-gray-400">Formatos: PNG, JPG. Tamaño máximo: 500KB</p>
+          </div>
+          {settings.invoiceLogoBase64 && (
+            <div className="space-y-2">
+              <Label>Vista previa del logo</Label>
+              <div className="border rounded-lg p-4 bg-gray-50 flex items-center justify-center">
+                <img 
+                  src={settings.invoiceLogoBase64} 
+                  alt="Logo preview" 
+                  className="max-h-24 max-w-48 object-contain"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
