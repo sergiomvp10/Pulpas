@@ -1,4 +1,4 @@
-import { Lot } from '@prisma/client';
+import type { Lot } from '@prisma/client';
 
 export interface LotAllocation {
   lotId: string;
