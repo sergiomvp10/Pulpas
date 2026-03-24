@@ -79,6 +79,19 @@ export async function POST(request: NextRequest) {
       });
 
       for (const line of lines as SaleLine[]) {
+        const productVariant = await tx.productVariant.findUnique({
+          where: { id: line.productVariantId },
+          include: {
+            productBase: {
+              select: { name: true },
+            },
+          },
+        });
+
+        const productName = productVariant
+          ? `${productVariant.productBase.name} ${productVariant.gramWeightG}g`
+          : 'Producto desconocido';
+
         const availableLots = await tx.lot.findMany({
           where: {
             productVariantId: line.productVariantId,
@@ -93,7 +106,7 @@ export async function POST(request: NextRequest) {
 
         if (allocation.remainingQuantity > 0) {
           throw new Error(
-            `Stock insuficiente para el producto. Disponible: ${allocation.totalAllocated}, Requerido: ${line.quantity}`
+            `Stock insuficiente para "${productName}". Disponible: ${allocation.totalAllocated}, Requerido: ${line.quantity}`
           );
         }
 

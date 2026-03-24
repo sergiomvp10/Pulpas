@@ -111,6 +111,10 @@ function getPaymentMethodColor(method: string): string {
   return colors[method] || 'bg-gray-100 text-gray-800';
 }
 
+interface InvoiceSettings {
+  invoiceLogoBase64: string;
+  businessName: string;
+}
 export function BillingClient() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
@@ -120,10 +124,30 @@ export function BillingClient() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [invoiceSettings, setInvoiceSettings] = useState<InvoiceSettings>({
+    invoiceLogoBase64: '',
+    businessName: 'FrutyLab',
+  });
 
   useEffect(() => {
     fetchSales();
+    fetchSettings();
   }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('/api/settings');
+      if (response.ok) {
+        const data = await response.json();
+        setInvoiceSettings({
+          invoiceLogoBase64: data.invoiceLogoBase64 || '',
+          businessName: data.businessName || 'FrutyLab',
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching settings:', err);
+    }
+  };
 
   const fetchSales = async () => {
     try {
@@ -144,7 +168,13 @@ export function BillingClient() {
   const handleDownloadPDF = async (sale: Sale) => {
     try {
       setIsDownloading(true);
-      const blob = await pdf(<InvoicePDF sale={sale} />).toBlob();
+      const blob = await pdf(
+        <InvoicePDF 
+          sale={sale} 
+          logoBase64={invoiceSettings.invoiceLogoBase64 || undefined}
+          businessName={invoiceSettings.businessName}
+        />
+      ).toBlob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

@@ -11,16 +11,17 @@ export async function RecentSales() {
   const userRole = session?.user?.role;
   const userId = session?.user?.id;
   
-  const thirtyHoursAgo = new Date(nowColombia().getTime() - 36 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date(nowColombia());
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   
   let whereClause: any = {
     status: 'COMPLETED',
     occurredAt: {
-      gte: thirtyHoursAgo,
+      gte: thirtyDaysAgo,
     },
   };
 
-  if (userRole === 'SELLER') {
+  if (userRole === 'SELLER' && userId) {
     const seller = await prisma.seller.findUnique({
       where: { userId },
     });
