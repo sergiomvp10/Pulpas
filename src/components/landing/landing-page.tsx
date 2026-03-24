@@ -538,6 +538,22 @@ export function LandingPage({ config }: LandingPageProps) {
 
       {/* WhatsApp Floating Button */}
       <WhatsAppButton url={config.whatsappUrl} />
+
+      {/* Login Floating Button */}
+      <div className="fixed bottom-24 right-6 z-50">
+        <Link href="/login">
+          <div className="relative group">
+            <div className="absolute -top-10 right-0 bg-gray-800 text-white text-sm px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              Iniciar Sesión
+            </div>
+            <div className="flex items-center justify-center w-14 h-14 bg-orange-500 rounded-full shadow-lg hover:bg-orange-600 transition-all hover:scale-110 cursor-pointer">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }
