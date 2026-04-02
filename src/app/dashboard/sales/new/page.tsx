@@ -12,6 +12,17 @@ export const dynamic = 'force-dynamic';
 export default async function NewSalePage() {
   const session = await auth();
   const userRole = session?.user?.role || 'ADMIN';
+  const userId = session?.user?.id;
+
+  // Get seller ID if user is a seller
+  let sellerId: string | null = null;
+  if (userRole === 'SELLER' && userId) {
+    const seller = await prisma.seller.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    sellerId = seller?.id || null;
+  }
 
   const [productVariants, customers, sellers] = await Promise.all([
     prisma.productVariant.findMany({
@@ -46,8 +57,12 @@ export default async function NewSalePage() {
         },
       },
     }),
+    // Filter customers by seller if user is a SELLER
     prisma.customer.findMany({
-      where: { active: true },
+      where: { 
+        active: true,
+        ...(userRole === 'SELLER' && sellerId ? { createdBySellerId: sellerId } : {}),
+      },
       orderBy: { name: 'asc' },
     }),
     userRole === 'ADMIN' 
